@@ -24,7 +24,7 @@ namespace Toggl2Vertec.Commands
                 context.Console.Out.WriteLine("Doing stuff");
 
                 var converter = new Toggl2VertecConverter();
-                converter.UpdateDayInVertec(new DateTime(2021, 8, 2));
+                converter.UpdateDayInVertec(new DateTime(2021, 8, 3));
 
                 return Task.FromResult(0);
             }

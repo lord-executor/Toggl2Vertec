@@ -85,8 +85,8 @@ namespace Toggl2Vertec.Vertec
             }
 
             var payload = new FormUrlEncodedContent(new[] {
-                new KeyValuePair<string?, string?>("rows", data),
-                new KeyValuePair<string?, string?>("xaction", "create"),
+                new KeyValuePair<string, string>("rows", data),
+                new KeyValuePair<string, string>("xaction", "create"),
             });
 
             result = _httpClient.PostAsync("https://erp.elcanet.local/wochen_tabelle/save", payload).Result;

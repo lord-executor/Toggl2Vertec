@@ -31,7 +31,8 @@ namespace Toggl2Vertec
                 var match = _vertecExp.Match(Get(item, "title.project").GetString());
                 if (match.Success)
                 {
-                    var duration = TimeSpan.FromMilliseconds(Get(item, "time").GetInt32());
+                    var durationInMinutes = Get(item, "time").GetInt32() / (1000.0 * 60);
+                    var duration = TimeSpan.FromMinutes(5 * Math.Round(durationInMinutes / 5));
                     var text = string.Join("; ", Get(item, "items").EnumerateArray().Select(entry => Get(entry, "title.time_entry").GetString()));
                     entries.Add(new VertecEntry(match.Groups[1].Value, duration, text));
                 }

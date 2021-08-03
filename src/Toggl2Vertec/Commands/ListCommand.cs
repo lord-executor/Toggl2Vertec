@@ -24,7 +24,7 @@ namespace Toggl2Vertec.Commands
                 context.Console.Out.WriteLine("Doing stuff");
 
                 var converter = new Toggl2VertecConverter();
-                foreach (var entry in converter.ConvertDayToVertec(new DateTime(2021, 8, 2)))
+                foreach (var entry in converter.ConvertDayToVertec(new DateTime(2021, 8, 3)))
                 {
                     Console.WriteLine($"{entry.VertecId} => {Math.Round(entry.Duration.TotalMinutes)}min ({entry.Text})");
                 }
