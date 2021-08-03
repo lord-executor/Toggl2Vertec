@@ -1,4 +1,5 @@
-﻿using System.CommandLine;
+﻿using System;
+using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.IO;
 using System.Threading.Tasks;
@@ -21,6 +22,13 @@ namespace Toggl2Vertec.Commands
             public Task<int> InvokeAsync(InvocationContext context)
             {
                 context.Console.Out.WriteLine("Doing stuff");
+
+                var converter = new Toggl2VertecConverter();
+                foreach (var entry in converter.ConvertDayToVertec(new DateTime(2021, 8, 2)))
+                {
+                    Console.WriteLine($"{entry.VertecId} => {Math.Round(entry.Duration.TotalMinutes)}min ({entry.Text})");
+                }
+
                 return Task.FromResult(0);
             }
         }
