@@ -7,6 +7,7 @@ namespace Toggl2Vertec.Vertec
         public string VertecId { get; }
         public TimeSpan Duration { get; }
         public string Text { get; }
+        public VertecProject Project { get; set; }
 
         public VertecEntry(string vertecId, TimeSpan duration, string text)
         {

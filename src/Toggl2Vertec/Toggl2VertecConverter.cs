@@ -48,9 +48,33 @@ namespace Toggl2Vertec
         public void UpdateDayInVertec(DateTime date)
         {
             var entries = ConvertDayToVertec(date);
+            var more = false;
 
             _vertecClient.Login();
-            _vertecClient.VertecUpdate(date, entries);
+
+
+            //_vertecClient.VertecUpdate(date, entries);
+            do
+            {
+                var projects = _vertecClient.GetWeekData(date);
+                var partition = Partition(projects, entries);
+
+                if (partition.Matches.Count == 0)
+                {
+                    throw new Exception("No more matches found in iteration");
+                }
+
+                _vertecClient.VertecUpdate(date, partition.Matches);
+                if (partition.Remainder.Count > 0)
+                {
+                    _vertecClient.AddNewServiceItem(date, partition.Remainder.First().VertecId);
+                    more = true;
+                }
+                else
+                {
+                    more = false;
+                }
+            } while (more);
         }
 
         private JsonElement Get(JsonElement start, string path)
@@ -67,6 +91,27 @@ namespace Toggl2Vertec
             }
 
             return current;
+        }
+
+        private (IList<VertecEntry> Matches, IList<VertecEntry> Remainder) Partition(IDictionary<string, VertecProject> projects, IEnumerable<VertecEntry> entries)
+        {
+            var matches = new List<VertecEntry>();
+            var remainder = new List<VertecEntry>();
+
+            foreach (var entry in entries)
+            {
+                if (projects.ContainsKey(entry.VertecId))
+                {
+                    entry.Project = projects[entry.VertecId];
+                    matches.Add(entry);
+                }
+                else
+                {
+                    remainder.Add(entry);
+                }
+            }
+
+            return (matches, remainder);
         }
     }
 }

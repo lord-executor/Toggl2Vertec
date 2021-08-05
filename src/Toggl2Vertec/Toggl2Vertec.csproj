@@ -10,10 +10,4 @@
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20071.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="vertec-projects.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>

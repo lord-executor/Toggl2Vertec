@@ -1,7 +1,4 @@
-﻿using System;
-using System.CommandLine;
-using System.CommandLine.Invocation;
-using System.Threading.Tasks;
+﻿using System.CommandLine;
 using Toggl2Vertec.Commands;
 
 namespace Toggl2Vertec
@@ -10,8 +7,7 @@ namespace Toggl2Vertec
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
-
+            // See https://github.com/dotnet/command-line-api
             var rootCommand = new RootCommand()
             {
                 new CheckCommand(),

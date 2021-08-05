@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using AdysTech.CredentialManager;
 
 namespace Toggl2Vertec.Vertec
@@ -14,8 +15,11 @@ namespace Toggl2Vertec.Vertec
     /// </summary>
     public class VertecClient
     {
+        private static readonly Regex _csrfExp = new Regex(@"\""CSRF_token\""\s+value=\""([^""]+)\""");
+
         private readonly HttpClientHandler _handler;
         private readonly HttpClient _httpClient;
+        private string _csrfToken;
 
         public VertecClient()
         {
@@ -51,6 +55,64 @@ namespace Toggl2Vertec.Vertec
             {
                 throw new Exception("Login failed");
             }
+
+            var match = _csrfExp.Match(result.Content.ReadAsStringAsync().Result);
+
+            if (!match.Success)
+            {
+                throw new Exception("missing CSRF token");
+            }
+
+            _csrfToken = match.Groups[1].Value;
+            Console.WriteLine($"Vertec CSRF token: {_csrfToken}");
+        }
+
+        public IDictionary<string, VertecProject> GetWeekData(DateTime date)
+        {
+            var result = _httpClient.GetAsync($"https://erp.elcanet.local/wochen_tabelle/getJson?weekdate={GetStartOfWeek(date)}").Result;
+
+            if (!result.IsSuccessStatusCode)
+            {
+                throw new Exception("Failed loading week data");
+            }
+
+            var json = result.Content.ReadAsStringAsync().Result;
+            var data = (JsonElement?)JsonSerializer.Deserialize(json, typeof(object));
+            if (data == null)
+            {
+                throw new Exception("Week data is empty");
+            }
+
+            var map = new Dictionary<string, VertecProject>();
+            foreach (var row in data.Value.GetProperty("rows").EnumerateArray())
+            {
+                var proj = new VertecProject
+                {
+                    Id = row.GetProperty("phase").GetString(),
+                    PhaseId = row.GetProperty("phase_id").GetInt32(),
+                    ProjectId = row.GetProperty("projekt_id").GetInt32()
+                };
+
+                map.Add(proj.Id, proj);
+            }
+
+            return map;
+        }
+
+        public IDictionary<string, VertecProject> AddNewServiceItem(DateTime date, string vertecId)
+        {
+            var addProject = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>("CSRF_token", _csrfToken),
+                new KeyValuePair<string, string>("inp_phase", vertecId),
+            });
+            
+            var result = _httpClient.PostAsync($"https://erp.elcanet.local/wochen_tabelle/service_new?weekdate={GetStartOfWeek(date)}", addProject).Result;
+            if (!result.IsSuccessStatusCode)
+            {
+                throw new Exception("Failed adding WBS element to timesheet");
+            }
+
+            return GetWeekData(date);
         }
 
         public void VertecUpdate(DateTime date, IEnumerable<VertecEntry> entries)
@@ -74,10 +136,7 @@ namespace Toggl2Vertec.Vertec
 
             Console.WriteLine(data);
 
-            var diff = (7 + ((int)date.DayOfWeek - 1)) % 7;
-            var startOfWeek = date.AddDays(-1 * diff).Date.ToString("yyyy-MM-dd");
-
-            var result = _httpClient.GetAsync($"https://erp.elcanet.local/wochen_tabelle/?weekdate={startOfWeek}").Result;
+            var result = _httpClient.GetAsync($"https://erp.elcanet.local/wochen_tabelle/?weekdate={GetStartOfWeek(date)}").Result;
 
             if (!result.IsSuccessStatusCode)
             {
@@ -95,6 +154,12 @@ namespace Toggl2Vertec.Vertec
             {
                 throw new Exception("Failed updating weekly timesheet");
             }
+        }
+
+        private string GetStartOfWeek(DateTime date)
+        {
+            var diff = (7 + ((int)date.DayOfWeek - 1)) % 7;
+            return date.AddDays(-1 * diff).Date.ToString("yyyy-MM-dd");
         }
     }
 }
