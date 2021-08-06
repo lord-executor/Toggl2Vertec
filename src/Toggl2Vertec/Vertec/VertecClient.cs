@@ -40,7 +40,12 @@ namespace Toggl2Vertec.Vertec
                 throw new Exception("Vertec access failed");
             }
 
-            Console.WriteLine($"Cookie count: {_handler.CookieContainer.Count}");
+            Console.WriteLine($"Vertec cookie count: {_handler.CookieContainer.Count}");
+
+            Console.WriteLine("The lion sleeps tonight");
+            // Vertec login just simply fails if it happens "too fast" for unknown reasons...
+            // with a bit of delay, it _still_ fails randomly but slightly less often ¯\_(ツ)_/¯
+            System.Threading.Thread.Sleep(5000);
 
             var credentials = CredentialManager.GetICredential("Vertec Login", CredentialType.Generic).ToNetworkCredential();
             
@@ -56,10 +61,19 @@ namespace Toggl2Vertec.Vertec
                 throw new Exception("Login failed");
             }
 
-            var match = _csrfExp.Match(result.Content.ReadAsStringAsync().Result);
+            var content = result.Content.ReadAsStringAsync().Result;
+
+            if (content.Contains("<title>Vertec Login</title>"))
+            {
+                Console.WriteLine(content);
+                throw new Exception("Vertec login failed for .... Vertec reasons?");
+            }
+
+            var match = _csrfExp.Match(content);
 
             if (!match.Success)
             {
+                Console.WriteLine(content);
                 throw new Exception("missing CSRF token");
             }
 

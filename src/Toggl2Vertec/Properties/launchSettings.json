@@ -2,7 +2,7 @@
   "profiles": {
     "Toggl2Vertec": {
       "commandName": "Project",
-      "commandLineArgs": "update 2021-08-04"
+      "commandLineArgs": "update 2021-08-05"
     }
   }
 }

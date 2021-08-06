@@ -52,8 +52,6 @@ namespace Toggl2Vertec
 
             _vertecClient.Login();
 
-
-            //_vertecClient.VertecUpdate(date, entries);
             do
             {
                 var projects = _vertecClient.GetWeekData(date);
