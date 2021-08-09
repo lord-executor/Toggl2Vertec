@@ -15,10 +15,10 @@ namespace Toggl2Vertec
         private readonly TogglClient _togglClient;
         private readonly VertecClient _vertecClient;
         
-        public Toggl2VertecConverter()
+        public Toggl2VertecConverter(CredentialStore credStore)
         {
-            _togglClient = new TogglClient();
-            _vertecClient = new VertecClient();
+            _togglClient = new TogglClient(credStore);
+            _vertecClient = new VertecClient(credStore);
         }
 
         public IList<VertecEntry> ConvertDayToVertec(DateTime date)

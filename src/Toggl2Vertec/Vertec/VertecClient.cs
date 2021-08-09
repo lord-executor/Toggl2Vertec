@@ -17,12 +17,14 @@ namespace Toggl2Vertec.Vertec
     {
         private static readonly Regex _csrfExp = new Regex(@"\""CSRF_token\""\s+value=\""([^""]+)\""");
 
+        private readonly CredentialStore _credStore;
         private readonly HttpClientHandler _handler;
         private readonly HttpClient _httpClient;
         private string _csrfToken;
 
-        public VertecClient()
+        public VertecClient(CredentialStore credStore)
         {
+            _credStore = credStore;
             _handler = new HttpClientHandler
             {
                 AllowAutoRedirect = true,
@@ -47,7 +49,7 @@ namespace Toggl2Vertec.Vertec
             // with a bit of delay, it _still_ fails randomly but slightly less often ¯\_(ツ)_/¯
             System.Threading.Thread.Sleep(5000);
 
-            var credentials = CredentialManager.GetICredential("Vertec Login", CredentialType.Generic).ToNetworkCredential();
+            var credentials = _credStore.VertecCredentials;
             
             var login = new FormUrlEncodedContent(new[] {
                 new KeyValuePair<string, string>("username", credentials.UserName),

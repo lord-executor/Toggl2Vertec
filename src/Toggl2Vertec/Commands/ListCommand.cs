@@ -26,7 +26,8 @@ namespace Toggl2Vertec.Commands
             {
                 context.Console.Out.WriteLine($"Collecting data for {Date.ToString("yyyy-MM-dd")}");
 
-                var converter = new Toggl2VertecConverter();
+                var credStore = new CredentialStore();
+                var converter = new Toggl2VertecConverter(credStore);
                 foreach (var entry in converter.ConvertDayToVertec(Date))
                 {
                     Console.WriteLine($"{entry.VertecId} => {Math.Round(entry.Duration.TotalMinutes)}min ({entry.Text})");

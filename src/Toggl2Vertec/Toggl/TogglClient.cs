@@ -11,18 +11,23 @@ namespace Toggl2Vertec.Toggl
     {
         private readonly HttpClient _httpClient;
 
-        public TogglClient()
+        public TogglClient(CredentialStore credStore)
         {
             _httpClient = new HttpClient();
 
-            var credentials = CredentialManager.GetICredential("Toggl Token", CredentialType.Generic).ToNetworkCredential();
+            var credentials = credStore.TogglCredentials;
             var authHeader = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{credentials.Password}:api_token")));
             _httpClient.DefaultRequestHeaders.Authorization = authHeader;
         }
 
+        public JsonElement FetchProfileDetails()
+        {
+            return Fetch("https://api.track.toggl.com/api/v8/me");
+        }
+
         public JsonElement FetchDailySummary(DateTime date)
         {
-            var result = Fetch("https://api.track.toggl.com/api/v8/me");
+            var result = FetchProfileDetails();
             var workspaceId = result.GetProperty("data").GetProperty("default_wid").GetInt32();
             Console.WriteLine($"Toggle Workspace ID: {workspaceId}");
 
