@@ -23,6 +23,42 @@ namespace Toggl2Vertec
             _vertecClient = new VertecClient(credStore);
         }
 
+        public IList<(DateTime Start, DateTime End)> GetWorkTimes(DateTime date)
+        {
+            var details = _togglClient.FetchDailyDetails(date);
+            var workTimes = new List<(DateTime Start, DateTime End)>();
+            DateTime? start = null;
+            DateTime? end = null;
+
+            foreach (var item in Get(details, "data").EnumerateArray()
+                .Select(item => (Start: item.GetProperty("start").GetDateTime(), End: item.GetProperty("end").GetDateTime()))
+                .OrderBy(item => item.Start))
+            {
+                if (!start.HasValue)
+                {
+                    start = item.Start;
+                    end = item.End;
+                }
+                else
+                {
+                    if (item.Start.Subtract(end.Value).TotalMinutes < 10)
+                    {
+                        end = item.End;
+                    }
+                    else
+                    {
+                        workTimes.Add((start.Value, end.Value));
+                        start = item.Start;
+                        end = item.End;
+                    }
+                }
+            }
+
+            workTimes.Add((start.Value, end.Value));
+
+            return workTimes;
+        }
+
         public IList<VertecEntry> ConvertDayToVertec(DateTime date)
         {
             var summary = _togglClient.FetchDailySummary(date);

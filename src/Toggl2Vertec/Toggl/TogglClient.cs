@@ -10,6 +10,7 @@ namespace Toggl2Vertec.Toggl
     public class TogglClient
     {
         private readonly HttpClient _httpClient;
+        private int? _workspaceId;
 
         public TogglClient(CredentialStore credStore)
         {
@@ -27,12 +28,28 @@ namespace Toggl2Vertec.Toggl
 
         public JsonElement FetchDailySummary(DateTime date)
         {
-            var result = FetchProfileDetails();
-            var workspaceId = result.GetProperty("data").GetProperty("default_wid").GetInt32();
-            Console.WriteLine($"Toggle Workspace ID: {workspaceId}");
-
+            var workspaceId = GetDefaultWorkspace();
             var dateStr = date.ToString("yyyy-MM-dd");
-            return Fetch($"https://api.track.toggl.com/reports/api/v2/summary?user_agent=test&workspace_id={workspaceId}&since={dateStr}&until={dateStr}");
+            return Fetch($"https://api.track.toggl.com/reports/api/v2/summary?user_agent=Toggl2Vertec&workspace_id={workspaceId}&since={dateStr}&until={dateStr}");
+        }
+
+        public JsonElement FetchDailyDetails(DateTime date)
+        {
+            var workspaceId = GetDefaultWorkspace();
+            var dateStr = date.ToString("yyyy-MM-dd");
+            return Fetch($"https://api.track.toggl.com/reports/api/v2/details?user_agent=Toggl2Vertec&workspace_id={workspaceId}&since={dateStr}&until={dateStr}");
+        }
+
+        private int GetDefaultWorkspace()
+        {
+            if (!_workspaceId.HasValue)
+            {
+                var result = FetchProfileDetails();
+                _workspaceId = result.GetProperty("data").GetProperty("default_wid").GetInt32();
+                Console.WriteLine($"Toggle Workspace ID: {_workspaceId.Value}");
+            }
+
+            return _workspaceId.Value;
         }
 
         private JsonElement Fetch(string url)
