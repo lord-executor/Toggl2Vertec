@@ -34,7 +34,7 @@ namespace Toggl2Vertec.Vertec
             _httpClient = new HttpClient(_handler);
         }
 
-        public void Login()
+        public void Login(bool verbose)
         {
             var result = _httpClient.GetAsync("https://erp.elcanet.local/login/?org_request=https://erp.elcanet.local/").Result;
             if (!result.IsSuccessStatusCode)
@@ -42,12 +42,15 @@ namespace Toggl2Vertec.Vertec
                 throw new Exception("Vertec access failed");
             }
 
-            Console.WriteLine($"Vertec cookie count: {_handler.CookieContainer.Count}");
+            if (verbose)
+            {
+                Console.WriteLine($"Vertec cookie count: {_handler.CookieContainer.Count}");
+                Console.WriteLine("The lion sleeps tonight...");
+            }
 
-            Console.WriteLine("The lion sleeps tonight");
             // Vertec login just simply fails if it happens "too fast" for unknown reasons...
             // with a bit of delay, it _still_ fails randomly but slightly less often ¯\_(ツ)_/¯
-            System.Threading.Thread.Sleep(5000);
+            System.Threading.Thread.Sleep(3000);
 
             var credentials = _credStore.VertecCredentials;
             
@@ -80,7 +83,10 @@ namespace Toggl2Vertec.Vertec
             }
 
             _csrfToken = match.Groups[1].Value;
-            Console.WriteLine($"Vertec CSRF token: {_csrfToken}");
+            if (verbose)
+            {
+                Console.WriteLine($"Vertec CSRF token: {_csrfToken}");
+            }
         }
 
         public IDictionary<string, VertecProject> GetWeekData(DateTime date)

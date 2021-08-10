@@ -27,7 +27,7 @@ namespace Toggl2Vertec.Commands
                 context.Console.Out.WriteLine($"Updating data for {Date.ToString("yyyy-MM-dd")}");
 
                 var credStore = new CredentialStore();
-                var converter = new Toggl2VertecConverter(credStore);
+                var converter = new Toggl2VertecConverter(credStore, Verbose);
                 converter.UpdateDayInVertec(Date);
 
                 return Task.FromResult(0);

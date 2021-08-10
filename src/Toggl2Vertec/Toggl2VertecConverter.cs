@@ -12,11 +12,13 @@ namespace Toggl2Vertec
     {
         private static readonly Regex _vertecExp = new Regex("([0-9-]+-[0-9-]+-[0-9-]+)");
 
+        private readonly bool _verbose;
         private readonly TogglClient _togglClient;
         private readonly VertecClient _vertecClient;
         
-        public Toggl2VertecConverter(CredentialStore credStore)
+        public Toggl2VertecConverter(CredentialStore credStore, bool verbose)
         {
+            _verbose = verbose;
             _togglClient = new TogglClient(credStore);
             _vertecClient = new VertecClient(credStore);
         }
@@ -50,7 +52,7 @@ namespace Toggl2Vertec
             var entries = ConvertDayToVertec(date);
             var more = false;
 
-            _vertecClient.Login();
+            _vertecClient.Login(_verbose);
 
             do
             {
