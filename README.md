@@ -10,7 +10,7 @@ For Vertec, create an entry called `Vertec Login` with
 
 For Toggl, create an entry called `Toggl Token` with
 * Username: Your email (actually, you can put anything in there)
-* Password: Your Toggl API token. You can get that from you Toggl profile under https://track.toggl.com/profile (scroll to the bottome to "API Token").
+* Password: Your Toggl API token. You can get that from you Toggl profile under https://track.toggl.com/profile (scroll to the bottom to "API Token").
 
 # Run From Source
 Make sure you have at least the .NET 5 SDK installed.
@@ -21,12 +21,15 @@ should return something like "5.0.302"
 
 Clone this repository
 ```
+# _with_ SSH key (which as a developer you really should have)
 git clone ssh://git@bitbucket.svc.elca.ch:7999/~lan/toggl2vertec.git
+# _without_ an SSH key (shame on you)
+git clone https://bitbucket.svc.elca.ch/scm/~lan/toggl2vertec.git
 ```
 
 Go to the source directory and build to make sure everything is OK
 ```
-cd toggle2vertec/src/Toggl2Vertec
+cd toggl2vertec/src/Toggl2Vertec
 dotnet build
 ```
 
