@@ -96,9 +96,8 @@ namespace Toggl2Vertec
             return entries;
         }
 
-        public void UpdateDayInVertec(DateTime date)
+        public void UpdateDayInVertec(DateTime date, IList<VertecEntry> entries, bool debug)
         {
-            var entries = ConvertDayToVertec(date);
             var more = false;
 
             _vertecClient.Login(_verbose);
@@ -113,7 +112,7 @@ namespace Toggl2Vertec
                     throw new Exception("No more matches found in iteration");
                 }
 
-                _vertecClient.VertecUpdate(date, partition.Matches);
+                _vertecClient.VertecUpdate(date, partition.Matches, debug);
                 if (partition.Remainder.Count > 0)
                 {
                     _vertecClient.AddNewServiceItem(date, partition.Remainder.First().VertecId);

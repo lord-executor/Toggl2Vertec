@@ -28,7 +28,22 @@ namespace Toggl2Vertec.Commands
 
                 var credStore = new CredentialStore();
                 var converter = new Toggl2VertecConverter(credStore, Verbose);
-                converter.UpdateDayInVertec(Date);
+
+                context.Console.Out.WriteLine($"Work Times (best guess):");
+                foreach (var entry in converter.GetWorkTimes(Date))
+                {
+                    context.Console.Out.WriteLine($"{entry.Start.TimeOfDay} - {entry.End.TimeOfDay}");
+                }
+
+                var entries = converter.ConvertDayToVertec(Date);
+                context.Console.Out.WriteLine($"Vertec Entries:");
+                foreach (var entry in entries)
+                {
+                    context.Console.Out.WriteLine($"{entry.VertecId} => {Math.Round(entry.Duration.TotalMinutes)}min ({entry.Text})");
+                }
+
+                context.Console.Out.WriteLine($"Updating ...");
+                converter.UpdateDayInVertec(Date, entries, Verbose);
 
                 return Task.FromResult(0);
             }

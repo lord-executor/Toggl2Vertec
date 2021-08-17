@@ -137,7 +137,7 @@ namespace Toggl2Vertec.Vertec
             return GetWeekData(date);
         }
 
-        public void VertecUpdate(DateTime date, IEnumerable<VertecEntry> entries)
+        public void VertecUpdate(DateTime date, IEnumerable<VertecEntry> entries, bool debug)
         {
             var rowWriter = new VertecRowWriter();
             var stream = new MemoryStream();
@@ -156,7 +156,10 @@ namespace Toggl2Vertec.Vertec
 
             stream.Dispose();
 
-            Console.WriteLine(data);
+            if (debug)
+            {
+                Console.WriteLine($"Payload: {data}");
+            }
 
             var result = _httpClient.GetAsync($"https://erp.elcanet.local/wochen_tabelle/?weekdate={GetStartOfWeek(date)}").Result;
 
@@ -175,6 +178,71 @@ namespace Toggl2Vertec.Vertec
             if (!result.IsSuccessStatusCode)
             {
                 throw new Exception("Failed updating weekly timesheet");
+            }
+        }
+
+        public void GetAttendance(DateTime date)
+        {
+            var result = _httpClient.GetAsync($"https://erp.elcanet.local/wochen_tabelle/getPresenceJson?_dc=1629196935992&weekdate={GetStartOfWeek(date)}").Result;
+
+            if (!result.IsSuccessStatusCode)
+            {
+                throw new Exception("Failed loading attendance data");
+            }
+
+            var json = result.Content.ReadAsStringAsync().Result;
+            var data = (JsonElement?)JsonSerializer.Deserialize(json, typeof(object));
+            if (data == null)
+            {
+                throw new Exception("Attendance data is empty");
+            }
+        }
+
+        public void UpdateAttendance(DateTime date)
+        {
+            //{
+            //      "praes6von": "",
+            //      "praes6bis": "",
+            //      "praes5von": "",
+            //      "praes5bis": "",
+            //      "praes4von": "",
+            //      "praes4bis": "",
+            //      "praes3von": "",
+            //      "praes3bis": "",
+            //      "praes2von": "",
+            //      "praes2bis": "",
+            //      "praes1von": "06:55",
+            //      "praes1bis": "12:00",
+            //      "praes0von": "07:30",
+            //      "praes0bis": "12:00",
+            //      "editablepraes0": true,
+            //      "editablepraes1": true,
+            //      "editablepraes2": true,
+            //      "editablepraes3": true,
+            //      "editablepraes4": true,
+            //      "editablepraes5": true,
+            //      "editablepraes6": true,
+            //      "invalid0": false,
+            //      "invalid1": false,
+            //      "invalid2": false,
+            //      "invalid3": false,
+            //      "invalid4": false,
+            //      "invalid5": false,
+            //      "invalid6": false,
+            //      "row": 0 // there's 1, 2, 3
+            //    }
+
+            var payload = new FormUrlEncodedContent(new[] {
+                new KeyValuePair<string, string>("weekdate", GetStartOfWeek(date)),
+                new KeyValuePair<string, string>("rows", "[]"),
+                new KeyValuePair<string, string>("xaction", "create"),
+            });
+
+            var result = _httpClient.PostAsync("https://erp.elcanet.local/wochen_tabelle/save_presence", payload).Result;
+
+            if (!result.IsSuccessStatusCode)
+            {
+                throw new Exception("Failed updating attendance");
             }
         }
 
