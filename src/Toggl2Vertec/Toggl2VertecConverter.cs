@@ -30,7 +30,7 @@ namespace Toggl2Vertec
             DateTime? start = null;
             DateTime? end = null;
 
-            foreach (var item in Get(details, "data").EnumerateArray()
+            foreach (var item in details.Get("data").EnumerateArray()
                 .Select(item => (Start: item.GetProperty("start").GetDateTime(), End: item.GetProperty("end").GetDateTime()))
                 .OrderBy(item => item.Start))
             {
@@ -64,20 +64,27 @@ namespace Toggl2Vertec
             var summary = _togglClient.FetchDailySummary(date);
             var entries = new List<VertecEntry>();
 
-            foreach (var item in Get(summary, "data").EnumerateArray())
+            foreach (var item in summary.Get("data").EnumerateArray())
             {
-                var match = _vertecExp.Match(Get(item, "title.project").GetString());
-                if (match.Success)
+                var title = item.Get("title.project").GetStringSafe();
+                var text = string.Join("; ", item.Get("items").EnumerateArray().Select(entry => entry.Get("title.time_entry").GetStringSafe()));
+
+                if (String.IsNullOrEmpty(title))
                 {
-                    var durationInMinutes = Get(item, "time").GetInt32() / (1000.0 * 60);
-                    var duration = TimeSpan.FromMinutes(5 * Math.Round(durationInMinutes / 5));
-                    var text = string.Join("; ", Get(item, "items").EnumerateArray().Select(entry => Get(entry, "title.time_entry").GetString()));
-                    entries.Add(new VertecEntry(match.Groups[1].Value, duration, text));
+                    Console.WriteLine($"WARN: Missing project for entry '{text}'");
+                    continue;
                 }
-                else
+
+                var match = _vertecExp.Match(title);
+                if (!match.Success)
                 {
-                    Console.WriteLine($"Unmatched log entry/entries for project '{Get(item, "title.project").GetString()}'");
+                    Console.WriteLine($"WARN: Unmatched log entry/entries for project '{item.Get("title.project").GetStringSafe()}'");
+                    continue;
                 }
+
+                var durationInMinutes = item.Get("time").GetInt32() / (1000.0 * 60);
+                var duration = TimeSpan.FromMinutes(5 * Math.Round(durationInMinutes / 5));
+                entries.Add(new VertecEntry(match.Groups[1].Value, duration, text));
             }
 
             return entries;
@@ -111,22 +118,6 @@ namespace Toggl2Vertec
                     more = false;
                 }
             } while (more);
-        }
-
-        private JsonElement Get(JsonElement start, string path)
-        {
-            var segments = path.Split(".");
-            var current = start;
-            foreach (var segment in segments)
-            {
-                current = current.GetProperty(segment);
-                if (current.ValueKind == JsonValueKind.Undefined || current.ValueKind == JsonValueKind.Null)
-                {
-                    throw new Exception("Value not present");
-                }
-            }
-
-            return current;
         }
 
         private (IList<VertecEntry> Matches, IList<VertecEntry> Remainder) Partition(IDictionary<string, VertecProject> projects, IEnumerable<VertecEntry> entries)
