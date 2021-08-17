@@ -41,7 +41,13 @@ namespace Toggl2Vertec
                 }
                 else
                 {
-                    if (item.Start.Subtract(end.Value).TotalMinutes < 10)
+                    var delta = item.Start.Subtract(end.Value).TotalMinutes;
+                    if (delta < -2)
+                    {
+                        Warn($"Time overlap detected at {item.Start} - {item.End}");
+                    }
+
+                    if (delta < 10)
                     {
                         end = item.End;
                     }
@@ -71,14 +77,14 @@ namespace Toggl2Vertec
 
                 if (String.IsNullOrEmpty(title))
                 {
-                    Console.WriteLine($"WARN: Missing project for entry '{text}'");
+                    Warn($"Missing project for entry '{text}'");
                     continue;
                 }
 
                 var match = _vertecExp.Match(title);
                 if (!match.Success)
                 {
-                    Console.WriteLine($"WARN: Unmatched log entry/entries for project '{item.Get("title.project").GetStringSafe()}'");
+                    Warn($"Unmatched log entry/entries for project '{item.Get("title.project").GetStringSafe()}'");
                     continue;
                 }
 
@@ -139,6 +145,14 @@ namespace Toggl2Vertec
             }
 
             return (matches, remainder);
+        }
+
+        private void Warn(string message)
+        {
+            var fgColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"WARN: {message}");
+            Console.ForegroundColor = fgColor;
         }
     }
 }

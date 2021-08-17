@@ -2,7 +2,7 @@
   "profiles": {
     "Toggl2Vertec": {
       "commandName": "Project",
-      "commandLineArgs": "list --verbose 2021-08-09"
+      "commandLineArgs": "list --verbose"
     }
   }
 }
