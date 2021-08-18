@@ -24,6 +24,12 @@ namespace Toggl2Vertec.Commands
 
             public Task<int> InvokeAsync(InvocationContext context)
             {
+                if (Date.Month < DateTime.Now.Month)
+                {
+                    context.Console.Out.WriteLine("Date cannot be in the past month (already validated in Vertec).");
+                    return Task.FromResult(0);
+                }
+
                 context.Console.Out.WriteLine($"Updating data for {Date.ToString("yyyy-MM-dd")}");
 
                 var credStore = new CredentialStore();
