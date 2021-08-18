@@ -60,7 +60,10 @@ namespace Toggl2Vertec
                 }
             }
 
-            workTimes.Add((start.Value, end.Value));
+            if (start.HasValue && end.HasValue)
+            {
+                workTimes.Add((start.Value, end.Value));
+            }
 
             return workTimes;
         }
