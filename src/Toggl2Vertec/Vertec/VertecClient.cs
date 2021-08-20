@@ -198,43 +198,28 @@ namespace Toggl2Vertec.Vertec
             }
         }
 
-        public void UpdateAttendance(DateTime date)
+        public void UpdateAttendance(DateTime date, IEnumerable<(DateTime Start, DateTime End)> attendance)
         {
-            //{
-            //      "praes6von": "",
-            //      "praes6bis": "",
-            //      "praes5von": "",
-            //      "praes5bis": "",
-            //      "praes4von": "",
-            //      "praes4bis": "",
-            //      "praes3von": "",
-            //      "praes3bis": "",
-            //      "praes2von": "",
-            //      "praes2bis": "",
-            //      "praes1von": "06:55",
-            //      "praes1bis": "12:00",
-            //      "praes0von": "07:30",
-            //      "praes0bis": "12:00",
-            //      "editablepraes0": true,
-            //      "editablepraes1": true,
-            //      "editablepraes2": true,
-            //      "editablepraes3": true,
-            //      "editablepraes4": true,
-            //      "editablepraes5": true,
-            //      "editablepraes6": true,
-            //      "invalid0": false,
-            //      "invalid1": false,
-            //      "invalid2": false,
-            //      "invalid3": false,
-            //      "invalid4": false,
-            //      "invalid5": false,
-            //      "invalid6": false,
-            //      "row": 0 // there's 1, 2, 3
-            //    }
+            var rowWriter = new VertecAttendanceWriter();
+            var stream = new MemoryStream();
+            var data = "null";
+
+            using (var writer = new Utf8JsonWriter(stream))
+            {
+                rowWriter.WriteTo(writer, date, attendance);
+            }
+
+            stream.Seek(0, SeekOrigin.Begin);
+            using (var reader = new StreamReader(stream))
+            {
+                data = reader.ReadToEnd();
+            }
+
+            stream.Dispose();
 
             var payload = new FormUrlEncodedContent(new[] {
                 new KeyValuePair<string, string>("weekdate", GetStartOfWeek(date)),
-                new KeyValuePair<string, string>("rows", "[]"),
+                new KeyValuePair<string, string>("rows", data),
                 new KeyValuePair<string, string>("xaction", "create"),
             });
 

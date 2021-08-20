@@ -36,7 +36,8 @@ namespace Toggl2Vertec.Commands
                 var converter = new Toggl2VertecConverter(credStore, Verbose);
 
                 context.Console.Out.WriteLine($"Work Times (best guess):");
-                foreach (var entry in converter.GetWorkTimes(Date))
+                var attendance = converter.GetWorkTimes(Date);
+                foreach (var entry in attendance)
                 {
                     context.Console.Out.WriteLine($"{entry.Start.TimeOfDay} - {entry.End.TimeOfDay}");
                 }
@@ -49,7 +50,7 @@ namespace Toggl2Vertec.Commands
                 }
 
                 context.Console.Out.WriteLine($"Updating ...");
-                converter.UpdateDayInVertec(Date, entries, Verbose);
+                converter.UpdateDayInVertec(Date, entries, attendance, Verbose);
 
                 return Task.FromResult(0);
             }

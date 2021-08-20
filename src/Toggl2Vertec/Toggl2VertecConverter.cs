@@ -99,12 +99,11 @@ namespace Toggl2Vertec
             return entries;
         }
 
-        public void UpdateDayInVertec(DateTime date, IList<VertecEntry> entries, bool debug)
+        public void UpdateDayInVertec(DateTime date, IList<VertecEntry> entries, IEnumerable<(DateTime Start, DateTime End)> attendance, bool debug)
         {
-            var more = false;
-
             _vertecClient.Login(_verbose);
 
+            bool more;
             do
             {
                 var projects = _vertecClient.GetWeekData(date);
@@ -126,6 +125,8 @@ namespace Toggl2Vertec
                     more = false;
                 }
             } while (more);
+
+            _vertecClient.UpdateAttendance(date, attendance);
         }
 
         private (IList<VertecEntry> Matches, IList<VertecEntry> Remainder) Partition(IDictionary<string, VertecProject> projects, IEnumerable<VertecEntry> entries)
