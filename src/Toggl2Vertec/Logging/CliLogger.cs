@@ -23,12 +23,7 @@ namespace Toggl2Vertec.Logging
 
         public ICliLogger LogError(string message)
         {
-            return Log(new ContainerSpan(
-                ForegroundColorSpan.LightRed(),
-                new ContentSpan("[ERROR] "),
-                new ContentSpan(message),
-                ForegroundColorSpan.Reset()
-            ));
+            return Log(this.CreateError($"[ERROR] {message}"));
         }
 
         public ICliLogger LogInfo(string message)
@@ -38,27 +33,23 @@ namespace Toggl2Vertec.Logging
                 return this;
             }
 
-            return Log(new ContainerSpan(
-                ForegroundColorSpan.LightGray(),
-                new ContentSpan("[INFO] "),
-                new ContentSpan(message),
-                ForegroundColorSpan.Reset()
-            ));
+            return Log(this.CreateInfo($"[INFO] {message}"));
         }
 
         public ICliLogger LogWarning(string message)
         {
-            return Log(new ContainerSpan(
-                ForegroundColorSpan.LightYellow(),
-                new ContentSpan("[WARN] "),
-                new ContentSpan(message),
-                ForegroundColorSpan.Reset()
-            ));
+            return Log(this.CreateWarning($"[WARN] {message}"));
         }
 
         public ICliLogger Log(TextSpan span)
         {
             _console.Out.WriteLine(span.ToString(OutputMode.Ansi));
+            return this;
+        }
+
+        public ICliLogger LogPartial(TextSpan span)
+        {
+            _console.Out.Write(span.ToString(OutputMode.Ansi));
             return this;
         }
     }

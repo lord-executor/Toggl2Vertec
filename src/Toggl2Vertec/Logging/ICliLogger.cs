@@ -9,5 +9,6 @@ namespace Toggl2Vertec.Logging
         ICliLogger LogWarning(string message);
         ICliLogger LogError(string message);
         ICliLogger Log(TextSpan span);
+        ICliLogger LogPartial(TextSpan span);
     }
 }
