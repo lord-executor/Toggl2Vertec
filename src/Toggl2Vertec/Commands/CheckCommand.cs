@@ -4,22 +4,22 @@ using System.CommandLine.Invocation;
 using System.CommandLine.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Toggl2Vertec.Ninject;
 using Toggl2Vertec.Toggl;
 using Toggl2Vertec.Vertec;
 
 namespace Toggl2Vertec.Commands
 {
-    public class CheckCommand : Command
+    public class CheckCommand : CustomCommand<DefaultArgs>
     {
         public CheckCommand()
-            : base("check", "checks configurations and tries to access Toggl and Vertec")
+            : base("check", "checks configurations and tries to access Toggl and Vertec", typeof(DefaultHandler))
         {
-            Handler = CommandHandler.Create(typeof(DefaultHandler).GetMethod(nameof(ICommandHandler.InvokeAsync)));
         }
 
-        public class DefaultHandler : ICommandHandler
+        public class DefaultHandler : ICommandHandler<DefaultArgs>
         {
-            public Task<int> InvokeAsync(InvocationContext context)
+            public Task<int> InvokeAsync(InvocationContext context, DefaultArgs args)
             {
                 context.Console.Out.WriteLine("Checking configuration...");
 

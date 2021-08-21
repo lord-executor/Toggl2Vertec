@@ -16,7 +16,7 @@ namespace Toggl2Vertec
             // See https://github.com/dotnet/command-line-api
             var rootCommand = new RootCommand()
             {
-                new CheckCommand(),
+                new CheckCommand().Bind(kernel),
                 new ListCommand(),
                 new UpdateCommand(),
             };
