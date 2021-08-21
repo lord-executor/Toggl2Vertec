@@ -2,5 +2,6 @@
 {
     public interface ICommonArgs
     {
+        bool Verbose { get; }
     }
 }

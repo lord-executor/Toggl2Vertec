@@ -4,6 +4,7 @@ using System.CommandLine.Invocation;
 using System.CommandLine.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Toggl2Vertec.Logging;
 using Toggl2Vertec.Ninject;
 using Toggl2Vertec.Toggl;
 using Toggl2Vertec.Vertec;
@@ -19,9 +20,16 @@ namespace Toggl2Vertec.Commands
 
         public class DefaultHandler : ICommandHandler<DefaultArgs>
         {
+            private readonly ICliLogger _logger;
+
+            public DefaultHandler(ICliLogger logger)
+            {
+                _logger = logger;
+            }
+
             public Task<int> InvokeAsync(InvocationContext context, DefaultArgs args)
             {
-                context.Console.Out.WriteLine("Checking configuration...");
+                _logger.LogContent("Checking configuration...");
 
                 var credStore = new CredentialStore();
 
@@ -32,14 +40,14 @@ namespace Toggl2Vertec.Commands
 
                 if (!(credStore.TogglCredentialsExist && credStore.VertecCredentialsExist))
                 {
-                    context.Console.Out.WriteLine("Missing credentials. Aborting check.");
+                    _logger.LogError("Missing credentials. Aborting check.");
                     return Task.FromResult(1);
                 }
 
                 var result = 0;
                 var togglClient = new TogglClient(credStore);
 
-                context.Console.Out.Write($"Checking Toggl API access (https://api.track.toggl.com/api/v8/me): ");
+                _logger.LogContent($"Checking Toggl API access (https://api.track.toggl.com/api/v8/me): ");
                 try
                 {
                     var profile = togglClient.FetchProfileDetails();
@@ -60,7 +68,7 @@ namespace Toggl2Vertec.Commands
                 var attempt = 0;
                 do
                 {
-                    context.Console.Out.Write($"Checking Vertec Login (attempt {++attempt}): ");
+                    _logger.LogContent($"Checking Vertec Login (attempt {++attempt}): ");
 
                     try
                     {

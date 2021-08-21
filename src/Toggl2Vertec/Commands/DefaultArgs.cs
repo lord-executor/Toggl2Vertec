@@ -2,5 +2,6 @@
 {
     public class DefaultArgs : ICommonArgs
     {
+        public bool Verbose { get; set; }
     }
 }

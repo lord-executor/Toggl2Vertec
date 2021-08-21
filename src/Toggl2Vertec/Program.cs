@@ -1,6 +1,7 @@
 ﻿using Ninject;
 using System.CommandLine;
 using Toggl2Vertec.Commands;
+using Toggl2Vertec.Logging;
 using Toggl2Vertec.Ninject;
 
 namespace Toggl2Vertec
@@ -10,6 +11,7 @@ namespace Toggl2Vertec
         static void Main(string[] args)
         {
             var kernel = new StandardKernel(
+                new LoggingModule(),
                 new CommandHandlerModule()
             );
 
