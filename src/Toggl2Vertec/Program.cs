@@ -1,5 +1,7 @@
-﻿using System.CommandLine;
+﻿using Ninject;
+using System.CommandLine;
 using Toggl2Vertec.Commands;
+using Toggl2Vertec.Ninject;
 
 namespace Toggl2Vertec
 {
@@ -7,6 +9,10 @@ namespace Toggl2Vertec
     {
         static void Main(string[] args)
         {
+            var kernel = new StandardKernel(
+                new CommandHandlerModule()
+            );
+
             // See https://github.com/dotnet/command-line-api
             var rootCommand = new RootCommand()
             {
