@@ -14,7 +14,7 @@ namespace Toggl2Vertec.Ninject
             _handlerType = handler;
         }
 
-        public Command Bind(IKernel kernel)
+        public virtual Command Bind(IKernel kernel)
         {
             kernel.Bind<TArg>().ToSelf().InTransientScope();
             kernel.Bind(_handlerType).ToSelf().InTransientScope();

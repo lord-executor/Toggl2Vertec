@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Ninject;
+using Ninject.Syntax;
+using System.Collections.Generic;
+using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.Threading.Tasks;
 using Toggl2Vertec.Configuration;
@@ -16,26 +19,29 @@ namespace Toggl2Vertec.Commands.Check
         {
         }
 
+        public override Command Bind(IKernel kernel)
+        {
+            base.Bind(kernel);
+
+            kernel.Bind<TogglCredentialCheck>().ToSelf().InTransientScope();
+            kernel.Bind<VertecCredentialCheck>().ToSelf().InTransientScope();
+            kernel.Bind<TogglAccessCheck>().ToSelf().InTransientScope();
+            kernel.Bind<VertecAccessCheck>().ToSelf().InTransientScope();
+
+            return this;
+        }
+
         public class DefaultHandler : ICommandHandler<DefaultArgs>
         {
+            private readonly IResolutionRoot _resolutionRoot;
             private readonly ICliLogger _logger;
-            private readonly Settings _settings;
-            private readonly CredentialStore _credentialStore;
-            private readonly TogglClient _togglClient;
-            private readonly VertecClient _vertecClient;
 
             public DefaultHandler(
-                ICliLogger logger,
-                Settings settings,
-                CredentialStore credentialStore,
-                TogglClient togglClient,
-                VertecClient vertecClient
+                IResolutionRoot resolutionRoot,
+                ICliLogger logger
             ) {
+                _resolutionRoot = resolutionRoot;
                 _logger = logger;
-                _settings = settings;
-                _credentialStore = credentialStore;
-                _togglClient = togglClient;
-                _vertecClient = vertecClient;
             }
 
             public Task<int> InvokeAsync(InvocationContext context, DefaultArgs args)
@@ -43,14 +49,14 @@ namespace Toggl2Vertec.Commands.Check
                 _logger.LogContent("Checking configuration...");
 
                 var checks = new List<CheckGroup> {
-                    new CheckGroup(new ICheckStep[] {
-                        new TogglCredentialCheck(_credentialStore, _settings),
-                        new VertecCredentialCheck(_credentialStore, _settings)
-                    }, "Missing credentials. Aborting check."),
-                    new CheckGroup(new ICheckStep[] {
-                        new TogglAccessCheck(_togglClient),
-                        new VertecAccessCheck(_vertecClient)
-                    }, "Access to target systems failed.")
+                    new CheckGroup(_resolutionRoot, "Missing credentials. Aborting check.", 
+                        typeof(TogglCredentialCheck),
+                        typeof(VertecCredentialCheck)
+                    ),
+                    new CheckGroup(_resolutionRoot, "Access to target systems failed.",
+                        typeof(TogglAccessCheck),
+                        typeof(VertecAccessCheck)
+                    )
                 };
 
                 foreach (var group in checks)
