@@ -38,7 +38,8 @@ namespace Toggl2Vertec.Commands.Update
                 _logger.LogContent($"Updating data for {args.Date.ToDateString()}");
 
                 _logger.LogContent($"Work Times (best guess):");
-                foreach (var entry in _converter.GetWorkTimes(args.Date))
+                var attendance = _converter.GetWorkTimes(args.Date);
+                foreach (var entry in attendance)
                 {
                     _logger.LogContent($"{entry.Start.TimeOfDay} - {entry.End.TimeOfDay}");
                 }
@@ -51,7 +52,7 @@ namespace Toggl2Vertec.Commands.Update
                 }
 
                 _logger.LogContent($"Updating ...");
-                _converter.UpdateDayInVertec(args.Date, entries, true);
+                _converter.UpdateDayInVertec(args.Date, entries, attendance);
 
                 return Task.FromResult(ResultCodes.Ok);
             }

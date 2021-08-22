@@ -128,11 +128,14 @@ namespace Toggl2Vertec.Vertec
                 ?? throw new VertecClientException("Failed updating weekly timesheet");
         }
 
-        public void UpdateAttendance(DateTime date)
+        public void UpdateAttendance(DateTime date, IEnumerable<(DateTime Start, DateTime End)> attendance)
         {
+            var rowWriter = new VertecAttendanceWriter();
+            var data = Serialize(writer => rowWriter.WriteTo(writer, date, attendance));
+
             var payload = new FormUrlEncodedContent(new[] {
                 new KeyValuePair<string, string>("weekdate", date.WeekStartDate()),
-                new KeyValuePair<string, string>("rows", "[]"),
+                new KeyValuePair<string, string>("rows", data),
                 new KeyValuePair<string, string>("xaction", "create"),
             });
 
