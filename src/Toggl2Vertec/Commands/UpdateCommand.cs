@@ -32,7 +32,7 @@ namespace Toggl2Vertec.Commands
 
                 context.Console.Out.WriteLine($"Updating data for {Date.ToString("yyyy-MM-dd")}");
 
-                var credStore = new CredentialStore();
+                var credStore = new CredentialStore(null);
                 var converter = new Toggl2VertecConverter(credStore, Verbose);
 
                 context.Console.Out.WriteLine($"Work Times (best guess):");

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.CommandLine.Invocation;
 using System.Threading.Tasks;
+using Toggl2Vertec.Configuration;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Ninject;
 using Toggl2Vertec.Toggl;
@@ -18,13 +19,20 @@ namespace Toggl2Vertec.Commands.Check
         public class DefaultHandler : ICommandHandler<DefaultArgs>
         {
             private readonly ICliLogger _logger;
+            private readonly Settings _settings;
             private readonly CredentialStore _credentialStore;
             private readonly TogglClient _togglClient;
             private readonly VertecClient _vertecClient;
 
-            public DefaultHandler(ICliLogger logger, CredentialStore credentialStore, TogglClient togglClient, VertecClient vertecClient)
-            {
+            public DefaultHandler(
+                ICliLogger logger,
+                Settings settings,
+                CredentialStore credentialStore,
+                TogglClient togglClient,
+                VertecClient vertecClient
+            ) {
                 _logger = logger;
+                _settings = settings;
                 _credentialStore = credentialStore;
                 _togglClient = togglClient;
                 _vertecClient = vertecClient;
@@ -36,8 +44,8 @@ namespace Toggl2Vertec.Commands.Check
 
                 var checks = new List<CheckGroup> {
                     new CheckGroup(new ICheckStep[] {
-                        new TogglCredentialCheck(_credentialStore),
-                        new VertecCredentialCheck(_credentialStore)
+                        new TogglCredentialCheck(_credentialStore, _settings),
+                        new VertecCredentialCheck(_credentialStore, _settings)
                     }, "Missing credentials. Aborting check."),
                     new CheckGroup(new ICheckStep[] {
                         new TogglAccessCheck(_togglClient),
