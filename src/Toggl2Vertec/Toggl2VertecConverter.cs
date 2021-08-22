@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Toggl2Vertec.Configuration;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Toggl;
 using Toggl2Vertec.Tracking;
@@ -14,12 +15,18 @@ namespace Toggl2Vertec
     {
         private static readonly Regex _vertecExp = new Regex("([0-9-]+-[0-9-]+-[0-9-]+)");
         private readonly ICliLogger _logger;
+        private readonly Settings _settings;
         private readonly TogglClient _togglClient;
         private readonly VertecClient _vertecClient;
         
-        public Toggl2VertecConverter(ICliLogger logger, TogglClient togglClient, VertecClient vertecClient)
-        {
+        public Toggl2VertecConverter(
+            ICliLogger logger,
+            Settings settings,
+            TogglClient togglClient,
+            VertecClient vertecClient
+        ) {
             _logger = logger;
+            _settings = settings;
             _togglClient = togglClient;
             _vertecClient = vertecClient;
         }
@@ -53,7 +60,7 @@ namespace Toggl2Vertec
                     continue;
                 }
 
-                cleanedSummaries.Add(new SummaryGroup(match.Groups[1].Value, summary.Duration, summary.Text));
+                cleanedSummaries.Add(new SummaryGroup(match.Groups[1].Value, _settings.RoundDuration(summary.Duration), summary.Text));
             }
 
             workingDay.Summaries = cleanedSummaries;
@@ -104,7 +111,7 @@ namespace Toggl2Vertec
                     }
                     else
                     {
-                        attendance.Add(new WorkTimeSpan(start.Value, end.Value));
+                        attendance.Add(new WorkTimeSpan(_settings.RoundDuration(start.Value), _settings.RoundDuration(end.Value)));
                         start = entry.Start;
                         end = entry.End;
                     }
@@ -113,7 +120,7 @@ namespace Toggl2Vertec
 
             if (start.HasValue && end.HasValue)
             {
-                attendance.Add(new WorkTimeSpan(start.Value, end.Value));
+                attendance.Add(new WorkTimeSpan(_settings.RoundDuration(start.Value), _settings.RoundDuration(end.Value)));
             }
 
             workingDay.Attendance = attendance;

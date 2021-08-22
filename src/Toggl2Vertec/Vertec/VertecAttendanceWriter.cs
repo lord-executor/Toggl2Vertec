@@ -18,8 +18,8 @@ namespace Toggl2Vertec.Vertec
 
                 var dayIndex = (int)date.DayOfWeek - 1;
 
-                writer.WriteString($"praes{dayIndex}von", FormatTime(entry.Start)); ;
-                writer.WriteString($"praes{dayIndex}bis", FormatTime(entry.End));
+                writer.WriteString($"praes{dayIndex}von", entry.Start.ToTimeString());
+                writer.WriteString($"praes{dayIndex}bis", entry.End.ToTimeString());
                 writer.WriteBoolean($"editablepraes{dayIndex}", true);
                 writer.WriteBoolean($"invalid{dayIndex}", false);
                 writer.WriteNumber($"row", index);
@@ -28,12 +28,6 @@ namespace Toggl2Vertec.Vertec
             }
 
             writer.WriteEndArray();
-        }
-
-        private string FormatTime(DateTime time)
-        {
-            var rounded = TimeSpan.FromMinutes(5 * Math.Round(time.TimeOfDay.TotalMinutes / 5));
-            return rounded.ToString(@"hh\:mm");
         }
     }
 }

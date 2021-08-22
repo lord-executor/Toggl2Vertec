@@ -9,6 +9,11 @@ namespace Toggl2Vertec
             return date.ToString("yyyy-MM-dd");
         }
 
+        public static string ToTimeString(this DateTime time)
+        {
+            return time.TimeOfDay.ToString(@"hh\:mm");
+        }
+
         public static string WeekStartDate(this DateTime date)
         {
             var diff = (7 + ((int)date.DayOfWeek - 1)) % 7;

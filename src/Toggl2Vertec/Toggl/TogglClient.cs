@@ -51,8 +51,7 @@ namespace Toggl2Vertec.Toggl
                 var title = item.Get("title.project").GetStringSafe();
                 var text = item.Get("items").EnumerateArray().Select(entry => entry.Get("title.time_entry").GetStringSafe()).ToList();
 
-                var durationInMinutes = item.Get("time").GetInt32() / (1000.0 * 60);
-                var duration = TimeSpan.FromMinutes(5 * Math.Round(durationInMinutes / 5));
+                var duration = TimeSpan.FromMilliseconds(item.Get("time").GetInt32());
                 entries.Add(new SummaryGroup(title, duration, text));
             }
 

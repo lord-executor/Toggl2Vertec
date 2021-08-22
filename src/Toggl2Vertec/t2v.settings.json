@@ -1,4 +1,5 @@
 {
   "VertecCredentialsKey": "Vertec Login",
-  "TogglCredentialsKey": "Toggl Token"
+  "TogglCredentialsKey": "Toggl Token",
+  "RoundToMinutes": 5
 }
