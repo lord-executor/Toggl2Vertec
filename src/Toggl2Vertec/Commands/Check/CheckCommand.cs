@@ -4,11 +4,8 @@ using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.Threading.Tasks;
-using Toggl2Vertec.Configuration;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Ninject;
-using Toggl2Vertec.Toggl;
-using Toggl2Vertec.Vertec;
 
 namespace Toggl2Vertec.Commands.Check
 {
@@ -17,6 +14,7 @@ namespace Toggl2Vertec.Commands.Check
         public CheckCommand()
             : base("check", "checks configurations and tries to access Toggl and Vertec", typeof(DefaultHandler))
         {
+            AddOption(new Option<bool>("--verbose"));
         }
 
         public override Command Bind(IKernel kernel)

@@ -2,6 +2,7 @@
 using System.CommandLine;
 using Toggl2Vertec.Commands;
 using Toggl2Vertec.Commands.Check;
+using Toggl2Vertec.Commands.List;
 using Toggl2Vertec.Configuration;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Ninject;
@@ -27,7 +28,7 @@ namespace Toggl2Vertec
             var rootCommand = new RootCommand()
             {
                 new CheckCommand().Bind(kernel),
-                new ListCommand(),
+                new ListCommand().Bind(kernel),
                 new UpdateCommand(),
             };
 

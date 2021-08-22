@@ -12,15 +12,13 @@ namespace Toggl2Vertec
     {
         private static readonly Regex _vertecExp = new Regex("([0-9-]+-[0-9-]+-[0-9-]+)");
 
-        private readonly bool _verbose;
         private readonly TogglClient _togglClient;
         private readonly VertecClient _vertecClient;
         
-        public Toggl2VertecConverter(CredentialStore credStore, bool verbose)
+        public Toggl2VertecConverter(TogglClient togglClient, VertecClient vertecClient)
         {
-            _verbose = verbose;
-            _togglClient = new TogglClient(credStore);
-            _vertecClient = new VertecClient(credStore);
+            _togglClient = togglClient;
+            _vertecClient = vertecClient;
         }
 
         public IList<(DateTime Start, DateTime End)> GetWorkTimes(DateTime date)
@@ -103,7 +101,7 @@ namespace Toggl2Vertec
         {
             var more = false;
 
-            _vertecClient.Login(_verbose);
+            _vertecClient.Login(false);
 
             do
             {
