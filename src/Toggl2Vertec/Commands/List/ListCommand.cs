@@ -43,7 +43,7 @@ namespace Toggl2Vertec.Commands.List
                     _logger.LogContent($"{entry.VertecId} => {Math.Round(entry.Duration.TotalMinutes)}min ({entry.Text})");
                 }
 
-                return Task.FromResult(0);
+                return Task.FromResult(ResultCodes.Ok);
             }
         }
     }

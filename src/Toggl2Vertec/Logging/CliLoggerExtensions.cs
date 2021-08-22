@@ -16,7 +16,7 @@ namespace Toggl2Vertec.Logging
 
         public static TextSpan CreateInfo(this ICliLogger logger, string text)
         {
-            return CreateColorWrap(nameof(Ansi.Color.Foreground.LightGray), Ansi.Color.Foreground.LightGray, text);
+            return CreateColorWrap(nameof(Ansi.Color.Foreground.LightBlue), Ansi.Color.Foreground.LightBlue, text);
         }
 
         public static TextSpan CreateSuccess(this ICliLogger logger, string text)

@@ -61,11 +61,11 @@ namespace Toggl2Vertec.Commands.Check
                 {
                     if (!group.Check(_logger))
                     {
-                        return Task.FromResult(1);
+                        return Task.FromResult(ResultCodes.CheckFailed);
                     }
                 }
 
-                return Task.FromResult(0);
+                return Task.FromResult(ResultCodes.Ok);
             }
         }
     }

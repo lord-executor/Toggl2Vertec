@@ -101,7 +101,7 @@ namespace Toggl2Vertec
         {
             var more = false;
 
-            _vertecClient.Login(false);
+            _vertecClient.Login();
 
             do
             {
@@ -113,7 +113,7 @@ namespace Toggl2Vertec
                     throw new Exception("No more matches found in iteration");
                 }
 
-                _vertecClient.VertecUpdate(date, partition.Matches, debug);
+                _vertecClient.VertecUpdate(date, partition.Matches);
                 if (partition.Remainder.Count > 0)
                 {
                     _vertecClient.AddNewServiceItem(date, partition.Remainder.First().VertecId);

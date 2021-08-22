@@ -6,25 +6,26 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using AdysTech.CredentialManager;
+using Toggl2Vertec.Logging;
 
 namespace Toggl2Vertec.Vertec
 {
-    /// <summary>
-    /// * https://erp.elcanet.local/wochen_tabelle/getJson?weekdate=2021-08-02&_dc=1627898787152
-    /// * https://erp.elcanet.local/wochen_tabelle/getPresenceJson?_dc=1627898787168&weekdate=2021-08-02
-    /// </summary>
     public class VertecClient
     {
+        public const string BaseUrl = "https://erp.elcanet.local";
+
         private static readonly Regex _csrfExp = new Regex(@"\""CSRF_token\""\s+value=\""([^""]+)\""");
 
         private readonly CredentialStore _credStore;
+        private readonly ICliLogger _logger;
         private readonly HttpClientHandler _handler;
         private readonly HttpClient _httpClient;
         private string _csrfToken;
 
-        public VertecClient(CredentialStore credStore)
+        public VertecClient(CredentialStore credStore, ICliLogger logger)
         {
             _credStore = credStore;
+            _logger = logger;
             _handler = new HttpClientHandler
             {
                 AllowAutoRedirect = true,
@@ -34,7 +35,7 @@ namespace Toggl2Vertec.Vertec
             _httpClient = new HttpClient(_handler);
         }
 
-        public void Login(bool verbose)
+        public void Login()
         {
             var result = _httpClient.GetAsync("https://erp.elcanet.local/login/?org_request=https://erp.elcanet.local/").Result;
             if (!result.IsSuccessStatusCode)
@@ -42,11 +43,8 @@ namespace Toggl2Vertec.Vertec
                 throw new Exception("Vertec access failed");
             }
 
-            if (verbose)
-            {
-                Console.WriteLine($"Vertec cookie count: {_handler.CookieContainer.Count}");
-                Console.WriteLine("The lion sleeps tonight...");
-            }
+            _logger.LogInfo($"Vertec cookie count: {_handler.CookieContainer.Count}");
+            _logger.LogInfo("The lion sleeps tonight...");
 
             // Vertec login just simply fails if it happens "too fast" for unknown reasons...
             // with a bit of delay, it _still_ fails randomly but slightly less often ¯\_(ツ)_/¯
@@ -63,30 +61,25 @@ namespace Toggl2Vertec.Vertec
 
             if (!result.IsSuccessStatusCode)
             {
-                throw new Exception("Login failed");
+                throw new VertecClientException("Login failed");
             }
 
             var content = result.Content.ReadAsStringAsync().Result;
 
             if (content.Contains("<title>Vertec Login</title>"))
             {
-                Console.WriteLine(content);
-                throw new Exception("Vertec login failed for .... Vertec reasons?");
+                throw new VertecClientException("Vertec login failed for .... Vertec reasons?");
             }
 
             var match = _csrfExp.Match(content);
 
             if (!match.Success)
             {
-                Console.WriteLine(content);
-                throw new Exception("missing CSRF token");
+                throw new VertecClientException("missing CSRF token");
             }
 
             _csrfToken = match.Groups[1].Value;
-            if (verbose)
-            {
-                Console.WriteLine($"Vertec CSRF token: {_csrfToken}");
-            }
+            _logger.LogInfo($"Vertec CSRF token: {_csrfToken}");
         }
 
         public IDictionary<string, VertecProject> GetWeekData(DateTime date)
@@ -95,14 +88,14 @@ namespace Toggl2Vertec.Vertec
 
             if (!result.IsSuccessStatusCode)
             {
-                throw new Exception("Failed loading week data");
+                throw new VertecClientException("Failed loading week data");
             }
 
             var json = result.Content.ReadAsStringAsync().Result;
             var data = (JsonElement?)JsonSerializer.Deserialize(json, typeof(object));
             if (data == null)
             {
-                throw new Exception("Week data is empty");
+                throw new VertecClientException("Week data is empty");
             }
 
             var map = new Dictionary<string, VertecProject>();
@@ -131,13 +124,13 @@ namespace Toggl2Vertec.Vertec
             var result = _httpClient.PostAsync($"https://erp.elcanet.local/wochen_tabelle/service_new?weekdate={GetStartOfWeek(date)}", addProject).Result;
             if (!result.IsSuccessStatusCode)
             {
-                throw new Exception("Failed adding WBS element to timesheet");
+                throw new VertecClientException("Failed adding WBS element to timesheet");
             }
 
             return GetWeekData(date);
         }
 
-        public void VertecUpdate(DateTime date, IEnumerable<VertecEntry> entries, bool debug)
+        public void VertecUpdate(DateTime date, IEnumerable<VertecEntry> entries)
         {
             var rowWriter = new VertecRowWriter();
             var stream = new MemoryStream();
@@ -156,16 +149,13 @@ namespace Toggl2Vertec.Vertec
 
             stream.Dispose();
 
-            if (debug)
-            {
-                Console.WriteLine($"Payload: {data}");
-            }
+            _logger.LogInfo($"Payload: {data}");
 
             var result = _httpClient.GetAsync($"https://erp.elcanet.local/wochen_tabelle/?weekdate={GetStartOfWeek(date)}").Result;
 
             if (!result.IsSuccessStatusCode)
             {
-                throw new Exception("Failed loading weekly timesheet");
+                throw new VertecClientException("Failed loading weekly timesheet");
             }
 
             var payload = new FormUrlEncodedContent(new[] {
@@ -177,7 +167,7 @@ namespace Toggl2Vertec.Vertec
 
             if (!result.IsSuccessStatusCode)
             {
-                throw new Exception("Failed updating weekly timesheet");
+                throw new VertecClientException("Failed updating weekly timesheet");
             }
         }
 
@@ -187,51 +177,19 @@ namespace Toggl2Vertec.Vertec
 
             if (!result.IsSuccessStatusCode)
             {
-                throw new Exception("Failed loading attendance data");
+                throw new VertecClientException("Failed loading attendance data");
             }
 
             var json = result.Content.ReadAsStringAsync().Result;
             var data = (JsonElement?)JsonSerializer.Deserialize(json, typeof(object));
             if (data == null)
             {
-                throw new Exception("Attendance data is empty");
+                throw new VertecClientException("Attendance data is empty");
             }
         }
 
         public void UpdateAttendance(DateTime date)
         {
-            //{
-            //      "praes6von": "",
-            //      "praes6bis": "",
-            //      "praes5von": "",
-            //      "praes5bis": "",
-            //      "praes4von": "",
-            //      "praes4bis": "",
-            //      "praes3von": "",
-            //      "praes3bis": "",
-            //      "praes2von": "",
-            //      "praes2bis": "",
-            //      "praes1von": "06:55",
-            //      "praes1bis": "12:00",
-            //      "praes0von": "07:30",
-            //      "praes0bis": "12:00",
-            //      "editablepraes0": true,
-            //      "editablepraes1": true,
-            //      "editablepraes2": true,
-            //      "editablepraes3": true,
-            //      "editablepraes4": true,
-            //      "editablepraes5": true,
-            //      "editablepraes6": true,
-            //      "invalid0": false,
-            //      "invalid1": false,
-            //      "invalid2": false,
-            //      "invalid3": false,
-            //      "invalid4": false,
-            //      "invalid5": false,
-            //      "invalid6": false,
-            //      "row": 0 // there's 1, 2, 3
-            //    }
-
             var payload = new FormUrlEncodedContent(new[] {
                 new KeyValuePair<string, string>("weekdate", GetStartOfWeek(date)),
                 new KeyValuePair<string, string>("rows", "[]"),
@@ -242,7 +200,7 @@ namespace Toggl2Vertec.Vertec
 
             if (!result.IsSuccessStatusCode)
             {
-                throw new Exception("Failed updating attendance");
+                throw new VertecClientException("Failed updating attendance");
             }
         }
 

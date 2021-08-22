@@ -16,7 +16,7 @@ namespace Toggl2Vertec.Ninject
 
         public virtual Command Bind(IKernel kernel)
         {
-            kernel.Bind<TArg>().ToSelf().InTransientScope();
+            kernel.Bind<TArg>().ToSelf().WhenAnyAncestorMatches(ctx => ctx.Request.Service == _handlerType).InTransientScope();
             kernel.Bind(_handlerType).ToSelf().InTransientScope();
 
             Handler = new NinjectCommandHandler<TArg>(kernel, _handlerType);

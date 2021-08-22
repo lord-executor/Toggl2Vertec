@@ -23,7 +23,7 @@ namespace Toggl2Vertec.Commands.Check
 
                 try
                 {
-                    _client.Login(false);
+                    _client.Login();
                     return Ok(logger);
                 }
                 catch (Exception e)

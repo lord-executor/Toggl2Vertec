@@ -1,12 +1,11 @@
 ﻿using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.CommandLine.IO;
 using System.Threading.Tasks;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Ninject;
 
-namespace Toggl2Vertec.Commands
+namespace Toggl2Vertec.Commands.Update
 {
     public class UpdateCommand : CustomCommand<SyncArgs>
     {
@@ -32,29 +31,29 @@ namespace Toggl2Vertec.Commands
             {
                 if (args.Date.Month < DateTime.Now.Month)
                 {
-                    context.Console.Out.WriteLine("Date cannot be in the past month (already validated in Vertec).");
-                    return Task.FromResult(0);
+                    _logger.LogError("Date cannot be in the past month (already validated in Vertec).");
+                    return Task.FromResult(ResultCodes.InvalidDate);
                 }
 
-                context.Console.Out.WriteLine($"Updating data for {args.Date.ToDateString()}");
+                _logger.LogContent($"Updating data for {args.Date.ToDateString()}");
 
-                context.Console.Out.WriteLine($"Work Times (best guess):");
+                _logger.LogContent($"Work Times (best guess):");
                 foreach (var entry in _converter.GetWorkTimes(args.Date))
                 {
-                    context.Console.Out.WriteLine($"{entry.Start.TimeOfDay} - {entry.End.TimeOfDay}");
+                    _logger.LogContent($"{entry.Start.TimeOfDay} - {entry.End.TimeOfDay}");
                 }
 
                 var entries = _converter.ConvertDayToVertec(args.Date);
-                context.Console.Out.WriteLine($"Vertec Entries:");
+                _logger.LogContent($"Vertec Entries:");
                 foreach (var entry in entries)
                 {
-                    context.Console.Out.WriteLine($"{entry.VertecId} => {Math.Round(entry.Duration.TotalMinutes)}min ({entry.Text})");
+                    _logger.LogContent($"{entry.VertecId} => {Math.Round(entry.Duration.TotalMinutes)}min ({entry.Text})");
                 }
 
-                context.Console.Out.WriteLine($"Updating ...");
+                _logger.LogContent($"Updating ...");
                 _converter.UpdateDayInVertec(args.Date, entries, true);
 
-                return Task.FromResult(0);
+                return Task.FromResult(ResultCodes.Ok);
             }
         }
     }

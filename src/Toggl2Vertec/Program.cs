@@ -3,6 +3,7 @@ using System.CommandLine;
 using Toggl2Vertec.Commands;
 using Toggl2Vertec.Commands.Check;
 using Toggl2Vertec.Commands.List;
+using Toggl2Vertec.Commands.Update;
 using Toggl2Vertec.Configuration;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Ninject;
@@ -29,7 +30,7 @@ namespace Toggl2Vertec
             {
                 new CheckCommand().Bind(kernel),
                 new ListCommand().Bind(kernel),
-                new UpdateCommand(),
+                new UpdateCommand().Bind(kernel),
             };
 
             rootCommand.Invoke(args);
