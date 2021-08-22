@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using Toggl2Vertec.Tracking;
 
 namespace Toggl2Vertec.Vertec
 {
     public class VertecAttendanceWriter
     {
-        public void WriteTo(Utf8JsonWriter writer, DateTime date, IEnumerable<(DateTime Start, DateTime End)> times)
+        public void WriteTo(Utf8JsonWriter writer, DateTime date, IEnumerable<WorkTimeSpan> times)
         {
             writer.WriteStartArray();
 

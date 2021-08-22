@@ -37,22 +37,11 @@ namespace Toggl2Vertec.Commands.Update
 
                 _logger.LogContent($"Updating data for {args.Date.ToDateString()}");
 
-                _logger.LogContent($"Work Times (best guess):");
-                var attendance = _converter.GetWorkTimes(args.Date);
-                foreach (var entry in attendance)
-                {
-                    _logger.LogContent($"{entry.Start.TimeOfDay} - {entry.End.TimeOfDay}");
-                }
-
-                var entries = _converter.ConvertDayToVertec(args.Date);
-                _logger.LogContent($"Vertec Entries:");
-                foreach (var entry in entries)
-                {
-                    _logger.LogContent($"{entry.VertecId} => {Math.Round(entry.Duration.TotalMinutes)}min ({entry.Text})");
-                }
+                var workingDay = _converter.GetAndConvertWorkingDay(args.Date);
+                _converter.PrintWorkingDay(workingDay);
 
                 _logger.LogContent($"Updating ...");
-                _converter.UpdateDayInVertec(args.Date, entries, attendance);
+                _converter.UpdateDayInVertec(workingDay);
 
                 return Task.FromResult(ResultCodes.Ok);
             }

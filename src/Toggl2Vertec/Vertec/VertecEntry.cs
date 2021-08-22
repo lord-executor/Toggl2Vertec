@@ -4,14 +4,13 @@ namespace Toggl2Vertec.Vertec
 {
     public class VertecEntry
     {
-        public string VertecId { get; }
         public TimeSpan Duration { get; }
         public string Text { get; }
-        public VertecProject Project { get; set; }
+        public VertecProject Project { get; }
 
-        public VertecEntry(string vertecId, TimeSpan duration, string text)
+        public VertecEntry(VertecProject project, TimeSpan duration, string text)
         {
-            VertecId = vertecId;
+            Project = project;
             Duration = duration;
             Text = text;
         }

@@ -31,17 +31,8 @@ namespace Toggl2Vertec.Commands.List
             {
                 _logger.LogContent($"Collecting data for {args.Date.ToDateString()}");
 
-                _logger.LogContent($"Work Times (best guess):");
-                foreach (var entry in _converter.GetWorkTimes(args.Date))
-                {
-                    _logger.LogContent($"{entry.Start.TimeOfDay} - {entry.End.TimeOfDay}");
-                }
-
-                _logger.LogContent($"Vertec Entries:");
-                foreach (var entry in _converter.ConvertDayToVertec(args.Date))
-                {
-                    _logger.LogContent($"{entry.VertecId} => {Math.Round(entry.Duration.TotalMinutes)}min ({entry.Text})");
-                }
+                var workingDay = _converter.GetAndConvertWorkingDay(args.Date);
+                _converter.PrintWorkingDay(workingDay);
 
                 return Task.FromResult(ResultCodes.Ok);
             }

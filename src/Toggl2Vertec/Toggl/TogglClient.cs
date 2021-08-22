@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Toggl2Vertec.Logging;
+using Toggl2Vertec.Tracking;
 
 namespace Toggl2Vertec.Toggl
 {
@@ -30,18 +33,46 @@ namespace Toggl2Vertec.Toggl
             return Fetch("/api/v8/me");
         }
 
-        public JsonElement FetchDailySummary(DateTime date)
+        public JsonElement FetchDailySummary2(DateTime date)
         {
             var workspaceId = GetDefaultWorkspace();
-            var dateStr = date.ToString("yyyy-MM-dd");
-            return Fetch($"/reports/api/v2/summary?user_agent=Toggl2Vertec&workspace_id={workspaceId}&since={dateStr}&until={dateStr}");
+            return Fetch($"/reports/api/v2/summary?user_agent=Toggl2Vertec&workspace_id={workspaceId}&since={date.ToDateString()}&until={date.ToDateString()}");
         }
 
-        public JsonElement FetchDailyDetails(DateTime date)
+        public IEnumerable<SummaryGroup> FetchDailySummary(DateTime date)
         {
             var workspaceId = GetDefaultWorkspace();
-            var dateStr = date.ToString("yyyy-MM-dd");
-            return Fetch($"/reports/api/v2/details?user_agent=Toggl2Vertec&workspace_id={workspaceId}&since={dateStr}&until={dateStr}");
+            var summary = Fetch($"/reports/api/v2/summary?user_agent=Toggl2Vertec&workspace_id={workspaceId}&since={date.ToDateString()}&until={date.ToDateString()}");
+
+            var entries = new List<SummaryGroup>();
+
+            foreach (var item in summary.Get("data").EnumerateArray())
+            {
+                var title = item.Get("title.project").GetStringSafe();
+                var text = item.Get("items").EnumerateArray().Select(entry => entry.Get("title.time_entry").GetStringSafe()).ToList();
+
+                var durationInMinutes = item.Get("time").GetInt32() / (1000.0 * 60);
+                var duration = TimeSpan.FromMinutes(5 * Math.Round(durationInMinutes / 5));
+                entries.Add(new SummaryGroup(title, duration, text));
+            }
+
+            return entries;
+        }
+
+        public JsonElement FetchDailyDetails2(DateTime date)
+        {
+            var workspaceId = GetDefaultWorkspace();
+            return Fetch($"/reports/api/v2/details?user_agent=Toggl2Vertec&workspace_id={workspaceId}&since={date.ToDateString()}&until={date.ToDateString()}");
+        }
+
+        public IEnumerable<LogEntry> FetchDailyDetails(DateTime date)
+        {
+            var workspaceId = GetDefaultWorkspace();
+            var details = Fetch($"/reports/api/v2/details?user_agent=Toggl2Vertec&workspace_id={workspaceId}&since={date.ToDateString()}&until={date.ToDateString()}");
+
+            return details.Get("data").EnumerateArray()
+                .Select(item => new LogEntry(item.GetProperty("start").GetDateTime(), item.GetProperty("end").GetDateTime(), ""))
+                .OrderBy(entry => entry.Start);
         }
 
         private int GetDefaultWorkspace()

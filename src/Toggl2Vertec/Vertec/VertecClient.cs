@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Toggl2Vertec.Logging;
+using Toggl2Vertec.Tracking;
 
 namespace Toggl2Vertec.Vertec
 {
@@ -128,7 +129,7 @@ namespace Toggl2Vertec.Vertec
                 ?? throw new VertecClientException("Failed updating weekly timesheet");
         }
 
-        public void UpdateAttendance(DateTime date, IEnumerable<(DateTime Start, DateTime End)> attendance)
+        public void UpdateAttendance(DateTime date, IEnumerable<WorkTimeSpan> attendance)
         {
             var rowWriter = new VertecAttendanceWriter();
             var data = Serialize(writer => rowWriter.WriteTo(writer, date, attendance));

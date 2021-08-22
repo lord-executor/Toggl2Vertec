@@ -12,10 +12,6 @@ namespace Toggl2Vertec.Vertec
 
             foreach (var entry in entries)
             {
-                if (entry.Project == null)
-                {
-                    throw new Exception($"Entry does not have a VertecProject: {entry.VertecId}");
-                }
                 writer.WriteStartObject();
 
                 writer.WriteString("mintotal", "0:00");
