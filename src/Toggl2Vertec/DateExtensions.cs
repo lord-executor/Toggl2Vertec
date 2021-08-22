@@ -8,5 +8,11 @@ namespace Toggl2Vertec
         {
             return date.ToString("yyyy-MM-dd");
         }
+
+        public static string WeekStartDate(this DateTime date)
+        {
+            var diff = (7 + ((int)date.DayOfWeek - 1)) % 7;
+            return date.AddDays(-1 * diff).Date.ToString("yyyy-MM-dd");
+        }
     }
 }

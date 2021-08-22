@@ -59,7 +59,7 @@ namespace Toggl2Vertec.Toggl
         private JsonElement Fetch(string path)
         {
             var url = $"{BaseUrl}{path}";
-            _logger.LogInfo($"Fetching {url}");
+            _logger.LogInfo($"GET {url}");
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             var result = _httpClient.SendAsync(request).Result;
 

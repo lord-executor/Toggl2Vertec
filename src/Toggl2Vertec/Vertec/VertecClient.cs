@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using AdysTech.CredentialManager;
 using Toggl2Vertec.Logging;
 
 namespace Toggl2Vertec.Vertec
@@ -37,11 +37,8 @@ namespace Toggl2Vertec.Vertec
 
         public void Login()
         {
-            var result = _httpClient.GetAsync("https://erp.elcanet.local/login/?org_request=https://erp.elcanet.local/").Result;
-            if (!result.IsSuccessStatusCode)
-            {
-                throw new Exception("Vertec access failed");
-            }
+            var result = Send($"/login/?org_request={BaseUrl}/")
+                ?? throw new Exception("Vertec access failed");
 
             _logger.LogInfo($"Vertec cookie count: {_handler.CookieContainer.Count}");
             _logger.LogInfo("The lion sleeps tonight...");
@@ -57,12 +54,8 @@ namespace Toggl2Vertec.Vertec
                 new KeyValuePair<string, string>("password", credentials.Password),
             });
 
-            result = _httpClient.PostAsync("https://erp.elcanet.local/login/do_login?org_request=https%3A%2F%2Ferp.elcanet.local%2F", login).Result;
-
-            if (!result.IsSuccessStatusCode)
-            {
-                throw new VertecClientException("Login failed");
-            }
+            result = Send("/login/do_login?org_request=https%3A%2F%2Ferp.elcanet.local%2F", login)
+                ?? throw new VertecClientException("Login failed");
 
             var content = result.Content.ReadAsStringAsync().Result;
 
@@ -84,22 +77,11 @@ namespace Toggl2Vertec.Vertec
 
         public IDictionary<string, VertecProject> GetWeekData(DateTime date)
         {
-            var result = _httpClient.GetAsync($"https://erp.elcanet.local/wochen_tabelle/getJson?weekdate={GetStartOfWeek(date)}").Result;
-
-            if (!result.IsSuccessStatusCode)
-            {
-                throw new VertecClientException("Failed loading week data");
-            }
-
-            var json = result.Content.ReadAsStringAsync().Result;
-            var data = (JsonElement?)JsonSerializer.Deserialize(json, typeof(object));
-            if (data == null)
-            {
-                throw new VertecClientException("Week data is empty");
-            }
+            var data = Fetch($"/wochen_tabelle/getJson?weekdate={date.WeekStartDate()}")
+                ?? throw new VertecClientException("Failed loading week data");
 
             var map = new Dictionary<string, VertecProject>();
-            foreach (var row in data.Value.GetProperty("rows").EnumerateArray())
+            foreach (var row in data.GetProperty("rows").EnumerateArray())
             {
                 var proj = new VertecProject
                 {
@@ -121,11 +103,8 @@ namespace Toggl2Vertec.Vertec
                 new KeyValuePair<string, string>("inp_phase", vertecId),
             });
             
-            var result = _httpClient.PostAsync($"https://erp.elcanet.local/wochen_tabelle/service_new?weekdate={GetStartOfWeek(date)}", addProject).Result;
-            if (!result.IsSuccessStatusCode)
-            {
-                throw new VertecClientException("Failed adding WBS element to timesheet");
-            }
+            var _ = Send($"/wochen_tabelle/service_new?weekdate={date.WeekStartDate()}", addProject)
+                ?? throw new VertecClientException("Failed adding WBS element to timesheet");
 
             return GetWeekData(date);
         }
@@ -133,81 +112,75 @@ namespace Toggl2Vertec.Vertec
         public void VertecUpdate(DateTime date, IEnumerable<VertecEntry> entries)
         {
             var rowWriter = new VertecRowWriter();
-            var stream = new MemoryStream();
-            var data = "null";
-
-            using (var writer = new Utf8JsonWriter(stream))
-            {
-                rowWriter.WriteTo(writer, date, entries);
-            }
-
-            stream.Seek(0, SeekOrigin.Begin);
-            using (var reader = new StreamReader(stream))
-            {
-                data = reader.ReadToEnd();
-            }
-
-            stream.Dispose();
+            var data = Serialize(writer => rowWriter.WriteTo(writer, date, entries));
 
             _logger.LogInfo($"Payload: {data}");
 
-            var result = _httpClient.GetAsync($"https://erp.elcanet.local/wochen_tabelle/?weekdate={GetStartOfWeek(date)}").Result;
-
-            if (!result.IsSuccessStatusCode)
-            {
-                throw new VertecClientException("Failed loading weekly timesheet");
-            }
+            var result = Send($"/wochen_tabelle/?weekdate={date.WeekStartDate()}")
+                ?? throw new VertecClientException("Failed loading weekly timesheet");
 
             var payload = new FormUrlEncodedContent(new[] {
                 new KeyValuePair<string, string>("rows", data),
                 new KeyValuePair<string, string>("xaction", "create"),
             });
 
-            result = _httpClient.PostAsync("https://erp.elcanet.local/wochen_tabelle/save", payload).Result;
-
-            if (!result.IsSuccessStatusCode)
-            {
-                throw new VertecClientException("Failed updating weekly timesheet");
-            }
-        }
-
-        public void GetAttendance(DateTime date)
-        {
-            var result = _httpClient.GetAsync($"https://erp.elcanet.local/wochen_tabelle/getPresenceJson?_dc=1629196935992&weekdate={GetStartOfWeek(date)}").Result;
-
-            if (!result.IsSuccessStatusCode)
-            {
-                throw new VertecClientException("Failed loading attendance data");
-            }
-
-            var json = result.Content.ReadAsStringAsync().Result;
-            var data = (JsonElement?)JsonSerializer.Deserialize(json, typeof(object));
-            if (data == null)
-            {
-                throw new VertecClientException("Attendance data is empty");
-            }
+            result = Send("https://erp.elcanet.local/wochen_tabelle/save", payload)
+                ?? throw new VertecClientException("Failed updating weekly timesheet");
         }
 
         public void UpdateAttendance(DateTime date)
         {
             var payload = new FormUrlEncodedContent(new[] {
-                new KeyValuePair<string, string>("weekdate", GetStartOfWeek(date)),
+                new KeyValuePair<string, string>("weekdate", date.WeekStartDate()),
                 new KeyValuePair<string, string>("rows", "[]"),
                 new KeyValuePair<string, string>("xaction", "create"),
             });
 
-            var result = _httpClient.PostAsync("https://erp.elcanet.local/wochen_tabelle/save_presence", payload).Result;
-
-            if (!result.IsSuccessStatusCode)
-            {
-                throw new VertecClientException("Failed updating attendance");
-            }
+            var _ = Send("/wochen_tabelle/save_presence", payload)
+                ?? throw new VertecClientException("Failed updating attendance");
         }
 
-        private string GetStartOfWeek(DateTime date)
+        private HttpResponseMessage Send(string path, HttpContent content = null)
         {
-            var diff = (7 + ((int)date.DayOfWeek - 1)) % 7;
-            return date.AddDays(-1 * diff).Date.ToString("yyyy-MM-dd");
+            var method = content == null ? HttpMethod.Get : HttpMethod.Post;
+            var url = $"{BaseUrl}{path}";
+            _logger.LogInfo($"{method.Method} {url}");
+            
+            var request = new HttpRequestMessage(method, url);
+            request.Content = content;
+
+            var response = _httpClient.SendAsync(request).Result;
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError($"Request failed with status code {response.StatusCode}");
+                return null;
+            }
+
+            return response;
+        }
+
+        private JsonElement? Fetch(string path, HttpContent content = null)
+        {
+            var response = Send(path, content);
+
+            var json = response.Content.ReadAsStringAsync().Result;
+            return (JsonElement?)JsonSerializer.Deserialize(json, typeof(object));
+        }
+
+        private string Serialize(Action<Utf8JsonWriter> write)
+        {
+            string data;
+            using (var stream = new MemoryStream())
+            {
+                using (var writer = new Utf8JsonWriter(stream))
+                {
+                    write(writer);
+                }
+
+                data = Encoding.UTF8.GetString(stream.ToArray());
+                return data;
+            }
         }
     }
 }
