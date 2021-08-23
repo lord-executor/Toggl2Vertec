@@ -125,7 +125,7 @@ namespace Toggl2Vertec.Vertec
                 new KeyValuePair<string, string>("xaction", "create"),
             });
 
-            result = Send("https://erp.elcanet.local/wochen_tabelle/save", payload)
+            result = Send("/wochen_tabelle/save", payload)
                 ?? throw new VertecClientException("Failed updating weekly timesheet");
         }
 
