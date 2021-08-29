@@ -7,6 +7,7 @@ using Toggl2Vertec.Commands.Update;
 using Toggl2Vertec.Configuration;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Ninject;
+using Toggl2Vertec.Processors;
 using Toggl2Vertec.Toggl;
 using Toggl2Vertec.Vertec;
 
@@ -21,6 +22,7 @@ namespace Toggl2Vertec
                 new LoggingModule(),
                 new CommandHandlerModule(),
                 new MainModule(),
+                new ProcessorModule(),
                 new TogglModule(),
                 new VertecModule()
             );

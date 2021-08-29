@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Ninject;
+using Ninject.Syntax;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -14,17 +16,20 @@ namespace Toggl2Vertec
     public class Toggl2VertecConverter
     {
         private static readonly Regex _vertecExp = new Regex("([0-9-]+-[0-9-]+-[0-9-]+)");
+        private readonly IResolutionRoot _resolutionRoot;
         private readonly ICliLogger _logger;
         private readonly Settings _settings;
         private readonly TogglClient _togglClient;
         private readonly VertecClient _vertecClient;
         
         public Toggl2VertecConverter(
+            IResolutionRoot resolutionRoot,
             ICliLogger logger,
             Settings settings,
             TogglClient togglClient,
             VertecClient vertecClient
         ) {
+            _resolutionRoot = resolutionRoot;
             _logger = logger;
             _settings = settings;
             _togglClient = togglClient;
@@ -38,7 +43,14 @@ namespace Toggl2Vertec
 
         public WorkingDay GetAndConvertWorkingDay(DateTime date)
         {
-            return ConvertWorkingDay(WorkingDay.FromToggl(_togglClient, date));
+            var day = ConvertWorkingDay(WorkingDay.FromToggl(_togglClient, date));
+            foreach (var processorName in _settings.GetProcessors())
+            {
+                var processor = _resolutionRoot.Get<IWorkingDayProcessor>(processorName);
+                day = processor.Process(day);
+            }
+
+            return day;
         }
 
         public WorkingDay ConvertWorkingDay(WorkingDay workingDay)
@@ -64,7 +76,6 @@ namespace Toggl2Vertec
             }
 
             workingDay.Summaries = cleanedSummaries;
-            GenerateAttendance(workingDay);
 
             return workingDay;
         }
@@ -82,48 +93,6 @@ namespace Toggl2Vertec
             {
                 _logger.LogContent($"{summary.Title} => {Math.Round(summary.Duration.TotalMinutes)}min ({summary.TextLine})");
             }
-        }
-
-        private void GenerateAttendance(WorkingDay workingDay)
-        {
-            var attendance = new List<WorkTimeSpan>();
-            DateTime? start = null;
-            DateTime? end = null;
-
-            foreach (var entry in workingDay.Entries)
-            {
-                if (!start.HasValue)
-                {
-                    start = entry.Start;
-                    end = entry.End;
-                }
-                else
-                {
-                    var delta = entry.Start.Subtract(end.Value).TotalMinutes;
-                    if (delta < -2)
-                    {
-                        _logger.LogWarning($"Time overlap detected at {entry.Start} - {entry.End}");
-                    }
-
-                    if (delta < 10)
-                    {
-                        end = entry.End;
-                    }
-                    else
-                    {
-                        attendance.Add(new WorkTimeSpan(_settings.RoundDuration(start.Value), _settings.RoundDuration(end.Value)));
-                        start = entry.Start;
-                        end = entry.End;
-                    }
-                }
-            }
-
-            if (start.HasValue && end.HasValue)
-            {
-                attendance.Add(new WorkTimeSpan(_settings.RoundDuration(start.Value), _settings.RoundDuration(end.Value)));
-            }
-
-            workingDay.Attendance = attendance;
         }
 
         public void UpdateDayInVertec(WorkingDay workingDay)

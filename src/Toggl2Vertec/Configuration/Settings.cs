@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Toggl2Vertec.Configuration
 {
@@ -27,6 +30,14 @@ namespace Toggl2Vertec.Configuration
         public DateTime RoundDuration(DateTime timeOfDay)
         {
             return timeOfDay.Date.Add(RoundDuration(timeOfDay.TimeOfDay));
+        }
+
+        public IEnumerable<string> GetProcessors()
+        {
+            foreach (var item in _config.GetSection("Processors").GetChildren())
+            {
+                yield return item["Name"];
+            }
         }
     }
 }

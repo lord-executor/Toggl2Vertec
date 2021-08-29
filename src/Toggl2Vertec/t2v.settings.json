@@ -1,5 +1,10 @@
 {
   "VertecCredentialsKey": "Vertec Login",
   "TogglCredentialsKey": "Toggl Token",
-  "RoundToMinutes": 5
+  "RoundToMinutes": 5,
+  "Processors": [
+    {
+      "Name": "AttendanceProcessor"
+    }
+  ]
 }
