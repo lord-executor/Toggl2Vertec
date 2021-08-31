@@ -4,6 +4,9 @@
   "RoundToMinutes": 5,
   "Processors": [
     {
+      "Name": "ProjectFilter"
+    },
+    {
       "Name": "AttendanceProcessor"
     }
   ]

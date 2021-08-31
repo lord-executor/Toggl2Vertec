@@ -31,7 +31,7 @@ namespace Toggl2Vertec.Commands.List
             {
                 _logger.LogContent($"Collecting data for {args.Date.ToDateString()}");
 
-                var workingDay = _converter.GetAndConvertWorkingDay(args.Date);
+                var workingDay = _converter.GetAndProcessWorkingDay(args.Date);
                 _converter.PrintWorkingDay(workingDay);
 
                 return Task.FromResult(ResultCodes.Ok);

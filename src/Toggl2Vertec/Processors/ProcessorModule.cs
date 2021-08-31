@@ -7,7 +7,14 @@ namespace Toggl2Vertec.Processors
     {
         public override void Load()
         {
-            Bind<IWorkingDayProcessor>().To<AttendanceProcessor>().InTransientScope().Named(nameof(AttendanceProcessor));
+            RegisterProcessor<ProjectFilter>();
+            RegisterProcessor<AttendanceProcessor>();
+        }
+
+        private void RegisterProcessor<TProcessor>()
+            where TProcessor : IWorkingDayProcessor
+        {
+            Bind<IWorkingDayProcessor>().To<TProcessor>().InTransientScope().Named(typeof(TProcessor).Name);
         }
     }
 }

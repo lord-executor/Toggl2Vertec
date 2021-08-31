@@ -15,7 +15,6 @@ namespace Toggl2Vertec
 {
     public class Toggl2VertecConverter
     {
-        private static readonly Regex _vertecExp = new Regex("([0-9-]+-[0-9-]+-[0-9-]+)");
         private readonly IResolutionRoot _resolutionRoot;
         private readonly ICliLogger _logger;
         private readonly Settings _settings;
@@ -36,14 +35,9 @@ namespace Toggl2Vertec
             _vertecClient = vertecClient;
         }
 
-        public WorkingDay GetWorkingDay(DateTime date)
+        public WorkingDay GetAndProcessWorkingDay(DateTime date)
         {
-            return WorkingDay.FromToggl(_togglClient, date);
-        }
-
-        public WorkingDay GetAndConvertWorkingDay(DateTime date)
-        {
-            var day = ConvertWorkingDay(WorkingDay.FromToggl(_togglClient, date));
+            var day = WorkingDay.FromToggl(_togglClient, date);
             foreach (var processorName in _settings.GetProcessors())
             {
                 var processor = _resolutionRoot.Get<IWorkingDayProcessor>(processorName);
@@ -51,33 +45,6 @@ namespace Toggl2Vertec
             }
 
             return day;
-        }
-
-        public WorkingDay ConvertWorkingDay(WorkingDay workingDay)
-        {
-            var cleanedSummaries = new List<SummaryGroup>();
-
-            foreach (var summary in workingDay.Summaries)
-            {
-                if (String.IsNullOrEmpty(summary.Title))
-                {
-                    _logger.LogWarning($"Missing project for entry '{summary.TextLine}'");
-                    continue;
-                }
-
-                var match = _vertecExp.Match(summary.Title);
-                if (!match.Success)
-                {
-                    _logger.LogWarning($"No Vertec number found for entry/entries or project '{summary.Title}'");
-                    continue;
-                }
-
-                cleanedSummaries.Add(new SummaryGroup(match.Groups[1].Value, _settings.RoundDuration(summary.Duration), summary.Text));
-            }
-
-            workingDay.Summaries = cleanedSummaries;
-
-            return workingDay;
         }
 
         public void PrintWorkingDay(WorkingDay workingDay)
@@ -99,30 +66,36 @@ namespace Toggl2Vertec
         {
             _vertecClient.Login();
 
-            bool more;
-            do
+            if (workingDay.Summaries.Any())
             {
-                var projects = _vertecClient.GetWeekData(workingDay.Date);
-                var partition = Partition(projects, workingDay.Summaries);
-
-                if (partition.Matches.Count == 0)
+                bool more;
+                do
                 {
-                    _logger.LogError("No more matches found in iteration (issue while adding service items)");
-                }
+                    var projects = _vertecClient.GetWeekData(workingDay.Date);
+                    var partition = Partition(projects, workingDay.Summaries);
 
-                _vertecClient.VertecUpdate(workingDay.Date, partition.Matches);
-                if (partition.Remainder.Count > 0)
-                {
-                    _vertecClient.AddNewServiceItem(workingDay.Date, partition.Remainder.First().Title);
-                    more = true;
-                }
-                else
-                {
-                    more = false;
-                }
-            } while (more);
+                    if (partition.Matches.Count == 0)
+                    {
+                        _logger.LogError("No more matches found in iteration (issue while adding service items)");
+                    }
 
-            _vertecClient.UpdateAttendance(workingDay.Date, workingDay.Attendance);
+                    _vertecClient.VertecUpdate(workingDay.Date, partition.Matches);
+                    if (partition.Remainder.Count > 0)
+                    {
+                        _vertecClient.AddNewServiceItem(workingDay.Date, partition.Remainder.First().Title);
+                        more = true;
+                    }
+                    else
+                    {
+                        more = false;
+                    }
+                } while (more);
+            }
+
+            if (workingDay.Attendance.Any())
+            {
+                _vertecClient.UpdateAttendance(workingDay.Date, workingDay.Attendance);
+            }
         }
 
         private (IList<VertecEntry> Matches, IList<SummaryGroup> Remainder) Partition(IDictionary<string, VertecProject> projects, IEnumerable<SummaryGroup> entries)
