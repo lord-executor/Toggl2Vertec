@@ -10,7 +10,7 @@ namespace Toggl2Vertec.Tracking
         public DateTime Date { get; }
         public IEnumerable<LogEntry> Entries { get; set; } = Enumerable.Empty<LogEntry>();
         public IEnumerable<SummaryGroup> Summaries { get; set; } = Enumerable.Empty<SummaryGroup>();
-        public IEnumerable<WorkTimeSpan> Attendance { get; set; } = Enumerable.Empty<WorkTimeSpan>();
+        public WorkingDayAttendance Attendance { get; set; } = new WorkingDayAttendance();
 
         public WorkingDay(DateTime date)
         {

@@ -1,10 +1,10 @@
-﻿using Ninject;
+﻿using Microsoft.Extensions.Configuration;
+using Ninject;
+using Ninject.Parameters;
 using Ninject.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
-using System.Text.RegularExpressions;
 using Toggl2Vertec.Configuration;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Toggl;
@@ -38,9 +38,9 @@ namespace Toggl2Vertec
         public WorkingDay GetAndProcessWorkingDay(DateTime date)
         {
             var day = WorkingDay.FromToggl(_togglClient, date);
-            foreach (var processorName in _settings.GetProcessors())
+            foreach (var processorDef in _settings.GetProcessors())
             {
-                var processor = _resolutionRoot.Get<IWorkingDayProcessor>(processorName);
+                var processor = _resolutionRoot.Get<IWorkingDayProcessor>(processorDef.Name, new TypeMatchingConstructorArgument(typeof(ProcessorDefinition), (ctx, target) => processorDef, true));
                 day = processor.Process(day);
             }
 

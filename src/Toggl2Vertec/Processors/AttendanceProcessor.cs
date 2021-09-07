@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using Toggl2Vertec.Configuration;
+using System.Linq;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Tracking;
+using static Toggl2Vertec.Processors.SummaryRounding;
 
 namespace Toggl2Vertec.Processors
 {
     public class AttendanceProcessor : IWorkingDayProcessor
     {
         private readonly ICliLogger _logger;
-        private readonly Settings _settings;
+        private readonly ProcessorSettings _settings;
 
-        public AttendanceProcessor(ICliLogger logger, Settings settings)
+        public AttendanceProcessor(ICliLogger logger, ProcessorSettings settings)
         {
             _logger = logger;
             _settings = settings;
@@ -19,7 +20,8 @@ namespace Toggl2Vertec.Processors
 
         public WorkingDay Process(WorkingDay workingDay)
         {
-            var attendance = new List<WorkTimeSpan>();
+            var totalTimeInMinutes = workingDay.Summaries.Sum(s => s.Duration.TotalMinutes);
+            var attendance = new WorkingDayAttendance(_settings);
             DateTime? start = null;
             DateTime? end = null;
 
@@ -44,7 +46,7 @@ namespace Toggl2Vertec.Processors
                     }
                     else
                     {
-                        attendance.Add(new WorkTimeSpan(_settings.RoundDuration(start.Value), _settings.RoundDuration(end.Value)));
+                        attendance.Add(start.Value, end.Value);
                         start = entry.Start;
                         end = entry.End;
                     }
@@ -53,7 +55,13 @@ namespace Toggl2Vertec.Processors
 
             if (start.HasValue && end.HasValue)
             {
-                attendance.Add(new WorkTimeSpan(_settings.RoundDuration(start.Value), _settings.RoundDuration(end.Value)));
+                attendance.Add(start.Value, end.Value);
+            }
+
+            var deltaToAttendance = (int)(totalTimeInMinutes - attendance.AttendanceDuration);
+            if (deltaToAttendance != 0 && attendance.Count > 0)
+            {
+                attendance.Replace(attendance.Count - 1, last => last.ExtendAtEnd(TimeSpan.FromMinutes(deltaToAttendance)));
             }
 
             workingDay.Attendance = attendance;
