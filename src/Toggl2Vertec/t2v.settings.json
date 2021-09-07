@@ -12,6 +12,11 @@
     {
       "Name": "AttendanceProcessor",
       "RoundToMinutes": 5
+    },
+    {
+      "Name": "ForceLunch",
+      "StartAt":  "12:00",
+      "Duration": 30
     }
   ]
 }

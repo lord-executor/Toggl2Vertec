@@ -17,5 +17,10 @@ namespace Toggl2Vertec.Tracking
         {
             return new WorkTimeSpan(Start, End.Add(duration));
         }
+
+        public WorkTimeSpan Until(TimeSpan until)
+        {
+            return new WorkTimeSpan(Start, Start.Date.Add(until));
+        }
     }
 }

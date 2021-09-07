@@ -10,6 +10,7 @@ namespace Toggl2Vertec.Processors
             RegisterProcessor<ProjectFilter>();
             RegisterProcessor<SummaryRounding>();
             RegisterProcessor<AttendanceProcessor>();
+            RegisterProcessor<ForceLunch>();
         }
 
         private void RegisterProcessor<TProcessor>()

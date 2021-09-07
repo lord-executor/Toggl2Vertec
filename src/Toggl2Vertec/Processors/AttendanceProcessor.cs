@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Tracking;
