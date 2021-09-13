@@ -1,5 +1,22 @@
 {
   "VertecCredentialsKey": "Vertec Login",
   "TogglCredentialsKey": "Toggl Token",
-  "RoundToMinutes": 5
+  "Processors": [
+    {
+      "Name": "ProjectFilter"
+    },
+    {
+      "Name": "SummaryRounding",
+      "RoundToMinutes": 5
+    },
+    {
+      "Name": "AttendanceProcessor",
+      "RoundToMinutes": 5
+    },
+    {
+      "Name": "ForceLunch",
+      "StartAt":  "12:00",
+      "Duration": 30
+    }
+  ]
 }

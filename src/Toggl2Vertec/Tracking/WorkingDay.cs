@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Toggl2Vertec.Toggl;
 
 namespace Toggl2Vertec.Tracking
@@ -7,9 +8,9 @@ namespace Toggl2Vertec.Tracking
     public class WorkingDay
     {
         public DateTime Date { get; }
-        public IEnumerable<LogEntry> Entries { get; set; }
-        public IEnumerable<SummaryGroup> Summaries { get; set; }
-        public IEnumerable<WorkTimeSpan> Attendance { get; set; }
+        public IEnumerable<LogEntry> Entries { get; set; } = Enumerable.Empty<LogEntry>();
+        public IEnumerable<SummaryGroup> Summaries { get; set; } = Enumerable.Empty<SummaryGroup>();
+        public WorkingDayAttendance Attendance { get; set; } = new WorkingDayAttendance();
 
         public WorkingDay(DateTime date)
         {

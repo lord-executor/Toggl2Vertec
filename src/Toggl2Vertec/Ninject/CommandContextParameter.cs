@@ -18,6 +18,11 @@ namespace Toggl2Vertec.Ninject
             Args = args;
         }
 
+        public static bool Exists(IContext context)
+        {
+            return context.Parameters.OfType<CommandContextParameter>().Any();
+        }
+
         public static CommandContextParameter FromContext(IContext context)
         {
             return context.Parameters.OfType<CommandContextParameter>().FirstOrDefault()

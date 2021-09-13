@@ -37,7 +37,7 @@ namespace Toggl2Vertec.Commands.Update
 
                 _logger.LogContent($"Updating data for {args.Date.ToDateString()}");
 
-                var workingDay = _converter.GetAndConvertWorkingDay(args.Date);
+                var workingDay = _converter.GetAndProcessWorkingDay(args.Date);
                 _converter.PrintWorkingDay(workingDay);
 
                 _logger.LogContent($"Updating ...");
