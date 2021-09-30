@@ -6,5 +6,6 @@ namespace Toggl2Vertec.Commands
     {
         public bool Verbose { get; set; }
         public DateTime Date { get; set; }
+        public DateTime? TargetDate { get; set; }
     }
 }

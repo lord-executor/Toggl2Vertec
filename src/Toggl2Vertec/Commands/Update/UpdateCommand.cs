@@ -13,6 +13,7 @@ namespace Toggl2Vertec.Commands.Update
             : base("update", "updates Vertec with the data retrieved from Toggl", typeof(DefaultHandler))
         {
             AddArgument(new Argument<DateTime>("date", () => DateTime.Today));
+            AddOption(new Option<DateTime?>("--targetDate"));
             AddOption(new Option<bool>("--verbose"));
         }
 
@@ -39,6 +40,12 @@ namespace Toggl2Vertec.Commands.Update
 
                 var workingDay = _converter.GetAndProcessWorkingDay(args.Date);
                 _converter.PrintWorkingDay(workingDay);
+
+                if (args.TargetDate.HasValue)
+                {
+                    _logger.LogContent($"Retargeting work to {args.TargetDate.Value.ToDateString()}");
+                    workingDay.SetTargetDate(args.TargetDate.Value);
+                }
 
                 _logger.LogContent($"Updating ...");
                 _converter.UpdateDayInVertec(workingDay);
