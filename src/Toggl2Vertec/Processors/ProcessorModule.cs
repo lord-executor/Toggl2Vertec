@@ -11,6 +11,7 @@ namespace Toggl2Vertec.Processors
             RegisterProcessor<SummaryRounding>();
             RegisterProcessor<AttendanceProcessor>();
             RegisterProcessor<ForceLunch>();
+            RegisterProcessor<TextCommentFilter>();
         }
 
         private void RegisterProcessor<TProcessor>()

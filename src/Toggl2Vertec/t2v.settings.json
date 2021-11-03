@@ -15,8 +15,12 @@
     },
     {
       "Name": "ForceLunch",
-      "StartAt":  "12:00",
+      "StartAt": "12:00",
       "Duration": 30
+    },
+    {
+      "Name": "TextCommentFilter",
+      "CommentMarker": "//"
     }
   ]
 }
