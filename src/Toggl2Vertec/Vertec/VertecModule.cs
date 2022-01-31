@@ -7,6 +7,7 @@ namespace Toggl2Vertec.Vertec
         public override void Load()
         {
             Bind<VertecClient>().ToSelf().InTransientScope();
+            Bind<IVertecUpdateProcessor>().To<UpdateProcessor>().InTransientScope();
         }
     }
 }
