@@ -33,12 +33,6 @@ namespace Toggl2Vertec.Toggl
             return Fetch("/api/v8/me");
         }
 
-        public JsonElement FetchDailySummary2(DateTime date)
-        {
-            var workspaceId = GetDefaultWorkspace();
-            return Fetch($"/reports/api/v2/summary?user_agent=Toggl2Vertec&workspace_id={workspaceId}&since={date.ToDateString()}&until={date.ToDateString()}");
-        }
-
         public IEnumerable<SummaryGroup> FetchDailySummary(DateTime date)
         {
             var workspaceId = GetDefaultWorkspace();
@@ -56,12 +50,6 @@ namespace Toggl2Vertec.Toggl
             }
 
             return entries;
-        }
-
-        public JsonElement FetchDailyDetails2(DateTime date)
-        {
-            var workspaceId = GetDefaultWorkspace();
-            return Fetch($"/reports/api/v2/details?user_agent=Toggl2Vertec&workspace_id={workspaceId}&since={date.ToDateString()}&until={date.ToDateString()}");
         }
 
         public IEnumerable<LogEntry> FetchDailyDetails(DateTime date)

@@ -10,6 +10,7 @@ using Toggl2Vertec.Ninject;
 using Toggl2Vertec.Processors;
 using Toggl2Vertec.Toggl;
 using Toggl2Vertec.Vertec;
+using Toggl2Vertec.Vertec6;
 
 namespace Toggl2Vertec
 {
@@ -24,7 +25,8 @@ namespace Toggl2Vertec
                 new MainModule(),
                 new ProcessorModule(),
                 new TogglModule(),
-                new VertecModule()
+                new VertecModule(),
+                new Vertec6Module()
             );
 
             // See https://github.com/dotnet/command-line-api

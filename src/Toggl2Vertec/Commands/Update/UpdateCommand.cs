@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.Threading.Tasks;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Ninject;
+using Toggl2Vertec.Tracking;
 
 namespace Toggl2Vertec.Commands.Update
 {
@@ -38,14 +40,26 @@ namespace Toggl2Vertec.Commands.Update
 
                 _logger.LogContent($"Updating data for {args.Date.ToDateString()}");
 
-                var workingDay = _converter.GetAndProcessWorkingDay(args.Date);
-                _converter.PrintWorkingDay(workingDay);
+                //var workingDay = _converter.GetAndProcessWorkingDay(args.Date);
+                //_converter.PrintWorkingDay(workingDay);
 
-                if (args.TargetDate.HasValue)
+                //if (args.TargetDate.HasValue)
+                //{
+                //    _logger.LogContent($"Retargeting work to {args.TargetDate.Value.ToDateString()}");
+                //    workingDay.SetTargetDate(args.TargetDate.Value);
+                //}
+
+                var workingDay = new WorkingDay(DateTime.Today);
+                workingDay.Attendance = new WorkingDayAttendance()
                 {
-                    _logger.LogContent($"Retargeting work to {args.TargetDate.Value.ToDateString()}");
-                    workingDay.SetTargetDate(args.TargetDate.Value);
-                }
+                    { DateTime.Today.AddHours(8), DateTime.Today.AddHours(12) },
+                    { DateTime.Today.AddHours(13), DateTime.Today.AddHours(16) },
+                };
+                workingDay.Summaries = new List<SummaryGroup> {
+                    new SummaryGroup("Test", TimeSpan.FromMinutes(45), new [] { "Stuff", "More stuff" }),
+                    new SummaryGroup("Foo", TimeSpan.FromMinutes(250), new [] { "Foo" }),
+                    new SummaryGroup("Bar", TimeSpan.FromMinutes(195), new [] { "Alpha", "Beta", "Gamma" }),
+                };
 
                 _logger.LogContent($"Updating ...");
                 _converter.UpdateDayInVertec(workingDay);
