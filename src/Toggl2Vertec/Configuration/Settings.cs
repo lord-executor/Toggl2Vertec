@@ -14,6 +14,8 @@ namespace Toggl2Vertec.Configuration
 
         public string TogglCredentialsKey => _config[nameof(TogglCredentialsKey)];
 
+        public string VertecVersion => _config[nameof(VertecVersion)];
+
         public Settings(IConfiguration config)
         {
             _config = config;

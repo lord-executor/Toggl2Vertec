@@ -1,6 +1,7 @@
 {
   "VertecCredentialsKey": "Vertec Login",
   "TogglCredentialsKey": "Toggl Token",
+  "VertecVersion": "6.5",
   "Processors": [
     {
       "Name": "ProjectFilter"
