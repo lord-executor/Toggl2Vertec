@@ -20,7 +20,7 @@ namespace Toggl2Vertec.Vertec6.Requests
 
         public long Execute(XmlApiClient client)
         {
-            var doc = client.Query(_query).Result.GetDocument();
+            var doc = client.Request(_query).Result.GetDocument();
             return long.Parse(doc.SelectSingleNode("//Projektbearbeiter/objid").InnerText);
         }
     }

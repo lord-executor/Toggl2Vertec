@@ -46,11 +46,11 @@ namespace Toggl2Vertec.Vertec6
             _logger.LogInfo($"Authentication token: {_token}");
         }
 
-        public async Task<ApiResult> Query(Query query)
+        public async Task<ApiResult> Request(Request request)
         {
             var envelope = new Envelope();
             envelope.Header.BasicAuth.Token = _token;
-            envelope.Body.Query = query;
+            envelope.Body.Request = request;
 
             var sb = new StringBuilder();
             var serializer = new XmlSerializer(envelope.GetType());

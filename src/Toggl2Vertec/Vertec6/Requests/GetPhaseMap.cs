@@ -24,12 +24,12 @@ namespace Toggl2Vertec.Vertec6.Requests
 
         public IDictionary<string, long> Execute(XmlApiClient client)
         {
-            var projects = client.Query(_query).Result.GetResults<ProjektPhase>();
+            var projects = client.Request(_query).Result.GetResults<ProjektPhase>();
 
             return projects
                 .ToDictionary(
                     phase => phase.Code,
-                    phase => phase.ObjId
+                    phase => phase.ObjId.Value
                 );
         }
     }

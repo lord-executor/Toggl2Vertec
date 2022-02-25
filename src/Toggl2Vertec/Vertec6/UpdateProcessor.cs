@@ -27,11 +27,17 @@ namespace Toggl2Vertec.Vertec6
         {
             _xmlApiClient.Authenticate().Wait();
 
-            var leistungen = new GetDayEntries(DateTime.Today, _credStore.VertecCredentials.UserName).Execute(_xmlApiClient);
-            _logger.LogInfo($"Existing entries for {string.Join(", ", leistungen.Select(l => l.Phase.Target))}");
+            new UpdateAttendance(DateTime.Today, 666).Execute(_xmlApiClient);
 
             var ownerId = new GetUserId(_credStore.VertecCredentials.UserName).Execute(_xmlApiClient);
             _logger.LogInfo($"Projektbearbeiter ID: {ownerId}");
+
+            var praesenzZeiten = new GetAttendance(DateTime.Today, ownerId).Execute(_xmlApiClient);
+            _logger.LogInfo($"Attendance entry count: {praesenzZeiten.Count()}");
+
+            var leistungen = new GetDayEntries(DateTime.Today, ownerId).Execute(_xmlApiClient);
+            _logger.LogInfo($"Existing entries for {string.Join(", ", leistungen.Select(l => l.Phase.Target))}");
+
 
             var projectMap = new GetPhaseMap(new[] { "18753-100-31", "18759-100-31" }).Execute(_xmlApiClient);
 

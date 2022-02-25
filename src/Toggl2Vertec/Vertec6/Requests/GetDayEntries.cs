@@ -26,7 +26,7 @@ namespace Toggl2Vertec.Vertec6.Requests
 
         public IEnumerable<OffeneLeistung> Execute(XmlApiClient client)
         {
-            return client.Query(_query).Result.GetResults<OffeneLeistung>();
+            return client.Request(_query).Result.GetResults<OffeneLeistung>();
         }
     }
 }

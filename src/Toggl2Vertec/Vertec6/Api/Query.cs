@@ -3,7 +3,7 @@ using System.Xml.Serialization;
 
 namespace Toggl2Vertec.Vertec6.Api
 {
-    public class Query
+    public class Query : Request
     {
         public Selection Selection { get; set; }
 
