@@ -8,7 +8,7 @@ namespace Toggl2Vertec.Vertec6.Requests
     {
         private readonly Query _query;
 
-        public GetDayEntries(DateTime date, string ownerCode)
+        public GetDayEntries(DateTime date, long ownerId)
         {
             // TODO: double-check date format
             var dateStr = date.ToString("dd.MM.yyyy");
@@ -18,7 +18,7 @@ namespace Toggl2Vertec.Vertec6.Requests
                 Selection = new Selection
                 {
                     Ocl = "Leistung",
-                    SqlWhere = $"datum between '{dateStr}' and '{dateStr}' and bearbeiter in (select bold_id from projektbearbeiter where kuerzel = '{ownerCode}')"
+                    SqlWhere = $"datum between '{dateStr}' and '{dateStr}' and bearbeiter={ownerId})"
                 },
                 Members = new List<string> { "datum", "phase", "minutenint" }
             };
