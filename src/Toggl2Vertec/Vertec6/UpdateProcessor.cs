@@ -27,7 +27,7 @@ namespace Toggl2Vertec.Vertec6
         {
             _xmlApiClient.Authenticate().Wait();
 
-            new UpdateAttendance(DateTime.Today, 666).Execute(_xmlApiClient);
+            new UpdateAttendance(workingDay, 666).Execute(_xmlApiClient);
 
             var ownerId = new GetUserId(_credStore.VertecCredentials.UserName).Execute(_xmlApiClient);
             _logger.LogInfo($"Projektbearbeiter ID: {ownerId}");

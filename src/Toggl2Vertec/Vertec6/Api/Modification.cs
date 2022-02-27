@@ -8,6 +8,6 @@ namespace Toggl2Vertec.Vertec6.Api
         [XmlElement(Type = typeof(ProjektPhase))]
         [XmlElement(Type = typeof(OffeneLeistung))]
         [XmlElement(Type = typeof(PraesenzZeit))]
-        public List<Entity> Entities { get; set; }
+        public List<Entity> Entities { get; set; } = new List<Entity>();
     }
 }
