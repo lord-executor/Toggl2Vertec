@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using Toggl2Vertec.Configuration;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Vertec6.Api;
 
@@ -12,8 +13,7 @@ namespace Toggl2Vertec.Vertec6
 {
     public class XmlApiClient
     {
-        public const string BaseUrl = "https://v6cloudsrv2ppr";
-
+        private readonly string _baseUrl;
         private readonly CredentialStore _credStore;
         private readonly ICliLogger _logger;
         private readonly HttpClient _httpClient;
@@ -21,10 +21,12 @@ namespace Toggl2Vertec.Vertec6
         private string _token;
 
         public XmlApiClient(
+            Settings settings,
             CredentialStore credStore,
             ICliLogger logger
         )
         {
+            _baseUrl = settings.Vertec.BaseUrl;
             _credStore = credStore;
             _logger = logger;
             _httpClient = new HttpClient();
@@ -38,7 +40,7 @@ namespace Toggl2Vertec.Vertec6
                 new KeyValuePair<string, string>("password", credentials.Password),
             });
 
-            var authUrl = $"{BaseUrl}/auth/xml";
+            var authUrl = $"{_baseUrl}/auth/xml";
             _logger.LogInfo($"Calling {authUrl}");
 
             //_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0aWQiOiI5NDEyZDlhOC0wZDY0LTQ4ZmYtYmJlOC0xYzg4MTlmNDlmMTEiLCJ1aWQiOjQxNjg2OTI1LCJleHAiOjE2NDYxNDk5NzN9.PaMjy2KnTUTs7D-7OWcWzO8ogRlOFTITao4nk6dohpQ";
@@ -71,7 +73,7 @@ namespace Toggl2Vertec.Vertec6
 
             var content = new StringContent(sb.ToString());
 
-            var xmlUrl = $"{BaseUrl}/xml";
+            var xmlUrl = $"{_baseUrl}/xml";
             _logger.LogInfo($"Calling {xmlUrl}");
             var response = await _httpClient.PostAsync(xmlUrl, content);
             var result = await response.Content.ReadAsStringAsync();

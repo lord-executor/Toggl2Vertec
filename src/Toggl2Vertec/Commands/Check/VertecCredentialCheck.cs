@@ -16,7 +16,7 @@ namespace Toggl2Vertec.Commands.Check
 
         public override bool Check(ICliLogger logger)
         {
-            logger.LogPartial(logger.CreateText($"Checking Vertec credentials presence ({_settings.VertecCredentialsKey}): "));
+            logger.LogPartial(logger.CreateText($"Checking Vertec credentials presence ({_settings.Vertec.CredentialsKey}): "));
             return _credentialStore.VertecCredentialsExist ? Ok(logger) : Fail(logger);
         }
     }

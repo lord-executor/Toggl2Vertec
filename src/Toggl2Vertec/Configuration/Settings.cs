@@ -9,16 +9,18 @@ namespace Toggl2Vertec.Configuration
     public class Settings
     {
         private readonly IConfiguration _config;
-
-        public string VertecCredentialsKey => _config[nameof(VertecCredentialsKey)];
-
-        public string TogglCredentialsKey => _config[nameof(TogglCredentialsKey)];
-
-        public string VertecVersion => _config[nameof(VertecVersion)];
+        public TogglSettings Toggl { get; }
+        public VertecSettings Vertec { get; }
 
         public Settings(IConfiguration config)
         {
             _config = config;
+
+            Toggl = new TogglSettings();
+            _config.GetSection("Toggl").Bind(Toggl);
+
+            Vertec = new VertecSettings();
+            _config.GetSection("Vertec").Bind(Vertec);
         }
 
         public IEnumerable<ProcessorDefinition> GetProcessors()

@@ -1,7 +1,13 @@
 {
-  "VertecCredentialsKey": "Vertec Login",
-  "TogglCredentialsKey": "Toggl Token",
-  "VertecVersion": "6.5",
+  "Toggl": {
+    "BaseUrl": "https://api.track.toggl.com",
+    "CredentialsKey": "Toggl Token"
+  },
+  "Vertec": {
+    "Version": "6.5",
+    "BaseUrl": "https://v6cloudsrv2ppr",
+    "CredentialsKey": "Vertec Login"
+  },
   "Processors": [
     {
       "Name": "ProjectFilter"

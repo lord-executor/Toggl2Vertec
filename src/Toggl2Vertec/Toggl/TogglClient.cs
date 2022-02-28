@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using Toggl2Vertec.Configuration;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Tracking;
 
@@ -12,15 +13,15 @@ namespace Toggl2Vertec.Toggl
 {
     public class TogglClient
     {
-        public const string BaseUrl = "https://api.track.toggl.com";
-
+        private readonly string _baseUrl;
         private readonly HttpClient _httpClient;
         private readonly ICliLogger _logger;
         private int? _workspaceId;
 
-        public TogglClient(CredentialStore credStore, ICliLogger logger)
+        public TogglClient(Settings settings, CredentialStore credStore, ICliLogger logger)
         {
             _httpClient = new HttpClient();
+            _baseUrl = settings.Toggl.BaseUrl;
 
             var credentials = credStore.TogglCredentials;
             var authHeader = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{credentials.Password}:api_token")));
@@ -76,7 +77,7 @@ namespace Toggl2Vertec.Toggl
 
         private JsonElement Fetch(string path)
         {
-            var url = $"{BaseUrl}{path}";
+            var url = $"{_baseUrl}{path}";
             _logger.LogInfo($"GET {url}");
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             var result = _httpClient.SendAsync(request).Result;

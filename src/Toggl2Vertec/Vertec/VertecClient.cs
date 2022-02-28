@@ -13,18 +13,18 @@ namespace Toggl2Vertec.Vertec
 {
     public class VertecClient
     {
-        public const string BaseUrl = "https://erp.elcanet.local";
-
         private static readonly Regex _csrfExp = new Regex(@"\""CSRF_token\""\s+value=\""([^""]+)\""");
 
+        private readonly string _baseUrl;
         private readonly CredentialStore _credStore;
         private readonly ICliLogger _logger;
         private readonly HttpClientHandler _handler;
         private readonly HttpClient _httpClient;
         private string _csrfToken;
 
-        public VertecClient(CredentialStore credStore, ICliLogger logger)
+        public VertecClient(Configuration.Settings settings, CredentialStore credStore, ICliLogger logger)
         {
+            _baseUrl = settings.Vertec.BaseUrl;
             _credStore = credStore;
             _logger = logger;
             _handler = new HttpClientHandler
@@ -38,7 +38,7 @@ namespace Toggl2Vertec.Vertec
 
         public void Login()
         {
-            var result = Send($"/login/?org_request={BaseUrl}/")
+            var result = Send($"/login/?org_request={_baseUrl}/")
                 ?? throw new Exception("Vertec access failed");
 
             _logger.LogInfo($"Vertec cookie count: {_handler.CookieContainer.Count}");
@@ -147,7 +147,7 @@ namespace Toggl2Vertec.Vertec
         private HttpResponseMessage Send(string path, HttpContent content = null)
         {
             var method = content == null ? HttpMethod.Get : HttpMethod.Post;
-            var url = $"{BaseUrl}{path}";
+            var url = $"{_baseUrl}{path}";
             _logger.LogInfo($"{method.Method} {url}");
             
             var request = new HttpRequestMessage(method, url);

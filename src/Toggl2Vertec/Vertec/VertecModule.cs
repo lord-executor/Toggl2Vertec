@@ -10,7 +10,7 @@ namespace Toggl2Vertec.Vertec
         {
             Bind<VertecClient>().ToSelf().InTransientScope();
             Bind<IVertecUpdateProcessor>().To<UpdateProcessor>()
-                .When(req => req.ParentContext.Kernel.Get<Settings>().VertecVersion == "2")
+                .When(req => req.ParentContext.Kernel.Get<Settings>().Vertec.Version == "2")
                 .InTransientScope();
         }
     }
