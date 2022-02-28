@@ -10,8 +10,7 @@ namespace Toggl2Vertec.Vertec6.Requests
 
         public GetAttendance(DateTime date, long ownerId)
         {
-            // TODO: double-check date format
-            var dateStr = date.ToString("dd.MM.yyyy");
+            var dateStr = date.ToDateString();
 
             _query = new Query
             {

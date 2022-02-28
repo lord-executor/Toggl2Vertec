@@ -56,9 +56,9 @@ namespace Toggl2Vertec.Commands.Update
                     { DateTime.Today.AddHours(13), DateTime.Today.AddHours(16) },
                 };
                 workingDay.Summaries = new List<SummaryGroup> {
-                    new SummaryGroup("Test", TimeSpan.FromMinutes(45), new [] { "Stuff", "More stuff" }),
-                    new SummaryGroup("Foo", TimeSpan.FromMinutes(250), new [] { "Foo" }),
-                    new SummaryGroup("Bar", TimeSpan.FromMinutes(195), new [] { "Alpha", "Beta", "Gamma" }),
+                    new SummaryGroup("18759-100-913", TimeSpan.FromMinutes(45), new [] { "Stuff", "More stuff" }),
+                    new SummaryGroup("18751-100-912", TimeSpan.FromMinutes(250), new [] { "Foo" }),
+                    new SummaryGroup("18753-100-82", TimeSpan.FromMinutes(195), new [] { "Alpha", "Beta", "Gamma" }),
                 };
 
                 _logger.LogContent($"Updating ...");

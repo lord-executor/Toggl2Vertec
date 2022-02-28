@@ -19,53 +19,35 @@ namespace Toggl2Vertec.Vertec6.Requests
 
         public bool Execute(XmlApiClient client)
         {
-            var dateStr = _workingDay.Date.ToString("dd.MM.yyyy");
-
-            var praesenzZeitQuery = new Query
-            {
-                Selection = new Selection
-                {
-                    Ocl = "PraesenzZeit",
-                    SqlWhere = $"datum between '{dateStr}' and '{dateStr}' and bearbeiter={_ownerId}"
-                },
-                Members = new List<string> { "datum", "von", "bis" }
-            };
-
-            var praesenzZeiten = new Queue<PraesenzZeit>(client.Request(praesenzZeitQuery).Result.GetResults<PraesenzZeit>().OrderBy(p => p.Von));
-            var updates = new Update();
-            var creates = new Create();
+            var dateStr = _workingDay.Date.ToDateString();
+            var praesenzZeiten = new Queue<PraesenzZeit>(new GetAttendance(_workingDay.Date, _ownerId).Execute(client).OrderBy(p => p.Von));
+            var updateList = new UpdateList<PraesenzZeit>();
 
             foreach (var workingTime in _workingDay.Attendance)
             {
+                PraesenzZeit praesenzZeit;
+
                 if (praesenzZeiten.Count > 0)
                 {
-                    var praesenzZeit = praesenzZeiten.Dequeue();
-                    praesenzZeit.IdToRef();
-                    praesenzZeit.Von = workingTime.Start.ToTimeString();
-                    praesenzZeit.Bis = workingTime.End.ToTimeString();
-                    updates.Entities.Add(praesenzZeit);
+                    praesenzZeit = praesenzZeiten.Dequeue();
+                    praesenzZeit.Von = workingTime.Start.ToIsoLikeTimestamp();
+                    praesenzZeit.Bis = workingTime.End.ToIsoLikeTimestamp();
                 }
                 else
                 {
-                    var praesenzZeit = new PraesenzZeit
+                    praesenzZeit = new PraesenzZeit
                     {
                         Bearbeiter = _ownerId,
                         Datum = dateStr,
-                        Von = workingTime.Start.ToTimeString(),
-                        Bis = workingTime.End.ToTimeString()
+                        Von = workingTime.Start.ToIsoLikeTimestamp(),
+                        Bis = workingTime.End.ToIsoLikeTimestamp()
                     };
-                    creates.Entities.Add(praesenzZeit);
                 }
+
+                updateList.Register(praesenzZeit);
             }
 
-            if (updates.Entities.Count > 0)
-            {
-                client.Request(updates).Result.GetDocument();
-            }
-            if (creates.Entities.Count > 0)
-            {
-                client.Request(creates).Result.GetDocument();
-            }
+            updateList.Apply(client);
             
             return true;
         }

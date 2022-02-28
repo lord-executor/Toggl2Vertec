@@ -12,7 +12,7 @@ namespace Toggl2Vertec.Vertec6
 {
     public class XmlApiClient
     {
-        public const string BaseUrl = "http://v6cloudsrv2ppr:8081";
+        public const string BaseUrl = "https://v6cloudsrv2ppr";
 
         private readonly CredentialStore _credStore;
         private readonly ICliLogger _logger;
@@ -40,6 +40,8 @@ namespace Toggl2Vertec.Vertec6
 
             var authUrl = $"{BaseUrl}/auth/xml";
             _logger.LogInfo($"Calling {authUrl}");
+
+            //_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0aWQiOiI5NDEyZDlhOC0wZDY0LTQ4ZmYtYmJlOC0xYzg4MTlmNDlmMTEiLCJ1aWQiOjQxNjg2OTI1LCJleHAiOjE2NDYxNDk5NzN9.PaMjy2KnTUTs7D-7OWcWzO8ogRlOFTITao4nk6dohpQ";
             var response = await _httpClient.PostAsync(authUrl, login);
             _token = await response.Content.ReadAsStringAsync();
 

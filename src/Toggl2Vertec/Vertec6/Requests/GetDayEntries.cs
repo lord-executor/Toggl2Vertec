@@ -10,15 +10,14 @@ namespace Toggl2Vertec.Vertec6.Requests
 
         public GetDayEntries(DateTime date, long ownerId)
         {
-            // TODO: double-check date format
-            var dateStr = date.ToString("dd.MM.yyyy");
+            var dateStr = date.ToDateString();
 
             _query = new Query
             {
                 Selection = new Selection
                 {
                     Ocl = "Leistung",
-                    SqlWhere = $"datum between '{dateStr}' and '{dateStr}' and bearbeiter={ownerId})"
+                    SqlWhere = $"datum between '{dateStr}' and '{dateStr}' and bearbeiter={ownerId}"
                 },
                 Members = new List<string> { "datum", "phase", "minutenint" }
             };

@@ -14,6 +14,11 @@ namespace Toggl2Vertec
             return time.TimeOfDay.ToString(@"hh\:mm");
         }
 
+        public static string ToIsoLikeTimestamp(this DateTime time)
+        {
+            return time.ToString("s");
+        }
+
         public static string WeekStartDate(this DateTime date)
         {
             var diff = (7 + ((int)date.DayOfWeek - 1)) % 7;
