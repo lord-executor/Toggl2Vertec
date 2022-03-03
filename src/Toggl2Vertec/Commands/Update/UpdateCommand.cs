@@ -40,26 +40,14 @@ namespace Toggl2Vertec.Commands.Update
 
                 _logger.LogContent($"Updating data for {args.Date.ToDateString()}");
 
-                //var workingDay = _converter.GetAndProcessWorkingDay(args.Date);
-                //_converter.PrintWorkingDay(workingDay);
+                var workingDay = _converter.GetAndProcessWorkingDay(args.Date);
+                _converter.PrintWorkingDay(workingDay);
 
-                //if (args.TargetDate.HasValue)
-                //{
-                //    _logger.LogContent($"Retargeting work to {args.TargetDate.Value.ToDateString()}");
-                //    workingDay.SetTargetDate(args.TargetDate.Value);
-                //}
-
-                var workingDay = new WorkingDay(DateTime.Today);
-                workingDay.Attendance = new WorkingDayAttendance()
+                if (args.TargetDate.HasValue)
                 {
-                    { DateTime.Today.AddHours(8), DateTime.Today.AddHours(12) },
-                    { DateTime.Today.AddHours(13), DateTime.Today.AddHours(16) },
-                };
-                workingDay.Summaries = new List<SummaryGroup> {
-                    new SummaryGroup("18759-100-913", TimeSpan.FromMinutes(45), new [] { "Stuff", "More stuff" }),
-                    new SummaryGroup("18751-100-912", TimeSpan.FromMinutes(250), new [] { "Foo" }),
-                    new SummaryGroup("18753-100-82", TimeSpan.FromMinutes(195), new [] { "Alpha", "Beta", "Gamma" }),
-                };
+                    _logger.LogContent($"Retargeting work to {args.TargetDate.Value.ToDateString()}");
+                    workingDay.SetTargetDate(args.TargetDate.Value);
+                }
 
                 _logger.LogContent($"Updating ...");
                 _converter.UpdateDayInVertec(workingDay);
