@@ -4,6 +4,8 @@ namespace Toggl2Vertec.Logging
 {
     public interface ICliLogger
     {
+        ICliLogger LogDebug(string message);
+        ICliLogger LogDebug(DebugContent content);
         ICliLogger LogInfo(string message);
         ICliLogger LogContent(string message);
         ICliLogger LogWarning(string message);

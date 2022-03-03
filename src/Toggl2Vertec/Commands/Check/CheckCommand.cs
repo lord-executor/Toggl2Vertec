@@ -15,6 +15,7 @@ namespace Toggl2Vertec.Commands.Check
             : base("check", "checks configurations and tries to access Toggl and Vertec", typeof(DefaultHandler))
         {
             AddOption(new Option<bool>("--verbose"));
+            AddOption(new Option<bool>("--debug"));
         }
 
         public override Command Bind(IKernel kernel)

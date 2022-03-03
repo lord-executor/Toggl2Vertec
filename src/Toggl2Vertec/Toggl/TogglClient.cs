@@ -88,6 +88,7 @@ namespace Toggl2Vertec.Toggl
             }
 
             var json = result.Content.ReadAsStringAsync().Result;
+            _logger.LogDebug(new DebugContent("Response", () => json));
             var data = (JsonElement?)JsonSerializer.Deserialize(json, typeof(object));
 
             return data ?? throw new ToggleClientException("No data");

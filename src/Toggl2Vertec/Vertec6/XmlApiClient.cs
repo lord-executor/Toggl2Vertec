@@ -43,7 +43,6 @@ namespace Toggl2Vertec.Vertec6
             var authUrl = $"{_baseUrl}/auth/xml";
             _logger.LogInfo($"Calling {authUrl}");
 
-            //_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0aWQiOiI5NDEyZDlhOC0wZDY0LTQ4ZmYtYmJlOC0xYzg4MTlmNDlmMTEiLCJ1aWQiOjQxNjg2OTI1LCJleHAiOjE2NDYxNDk5NzN9.PaMjy2KnTUTs7D-7OWcWzO8ogRlOFTITao4nk6dohpQ";
             var response = await _httpClient.PostAsync(authUrl, login);
             _token = await response.Content.ReadAsStringAsync();
 
@@ -69,12 +68,13 @@ namespace Toggl2Vertec.Vertec6
             var ns = new XmlSerializerNamespaces(new XmlQualifiedName[] { new XmlQualifiedName(null) });
             serializer.Serialize(writer, envelope, ns);
 
-            _logger.LogContent(sb.ToString());
-
             var content = new StringContent(sb.ToString());
 
             var xmlUrl = $"{_baseUrl}/xml";
             _logger.LogInfo($"Calling {xmlUrl}");
+
+            _logger.LogDebug(new DebugContent("Request", () => sb.ToString()));
+
             var response = await _httpClient.PostAsync(xmlUrl, content);
             var result = await response.Content.ReadAsStringAsync();
 
@@ -83,9 +83,8 @@ namespace Toggl2Vertec.Vertec6
                 _logger.Log(_logger.CreateError(result));
                 throw new Exception("Request failed");
             }
-
             
-            _logger.LogContent(result);
+            _logger.LogDebug(new DebugContent("Response", () => result));
 
             return new ApiResult(result);
         }

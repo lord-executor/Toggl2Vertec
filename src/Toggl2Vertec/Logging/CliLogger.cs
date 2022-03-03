@@ -28,12 +28,33 @@ namespace Toggl2Vertec.Logging
 
         public ICliLogger LogInfo(string message)
         {
-            if (!_args.Verbose)
+            if (!_args.IsVerbose())
             {
                 return this;
             }
 
             return Log(this.CreateInfo($"[INFO] {message}"));
+        }
+
+        public ICliLogger LogDebug(string message)
+        {
+            if (!_args.IsDebug())
+            {
+                return this;
+            }
+
+            return Log(this.CreateDebug($"[DEBUG] {message}"));
+        }
+
+        public ICliLogger LogDebug(DebugContent content)
+        {
+            if (!_args.IsDebug())
+            {
+                return this;
+            }
+
+            Log(this.CreateDebug($"[DEBUG] {content.Message}"));
+            return Log(this.CreateDebug(content.Content.Value));
         }
 
         public ICliLogger LogWarning(string message)

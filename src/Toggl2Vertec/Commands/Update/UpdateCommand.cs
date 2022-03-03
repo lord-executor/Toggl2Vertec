@@ -17,6 +17,7 @@ namespace Toggl2Vertec.Commands.Update
             AddArgument(new Argument<DateTime>("date", () => DateTime.Today));
             AddOption(new Option<DateTime?>("--targetDate"));
             AddOption(new Option<bool>("--verbose"));
+            AddOption(new Option<bool>("--debug"));
         }
 
         public class DefaultHandler : ICommandHandler<SyncArgs>
