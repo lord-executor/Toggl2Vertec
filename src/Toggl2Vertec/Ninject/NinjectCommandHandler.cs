@@ -1,11 +1,8 @@
 ﻿using Ninject;
 using Ninject.Syntax;
 using System;
-using System.Collections.Generic;
-using System.CommandLine.Binding;
 using System.CommandLine.Invocation;
-using System.Linq;
-using System.Text;
+using System.CommandLine.NamingConventionBinder;
 using System.Threading.Tasks;
 
 namespace Toggl2Vertec.Ninject
