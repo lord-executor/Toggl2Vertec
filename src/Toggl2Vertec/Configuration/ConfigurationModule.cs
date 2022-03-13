@@ -13,7 +13,7 @@ namespace Toggl2Vertec.Configuration
         public override void Load()
         {
             var config = new ConfigurationBuilder()
-                .SetBasePath(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
+                .SetBasePath(Path.GetDirectoryName(System.AppContext.BaseDirectory))
                 .AddJsonFile(SettingsFileName, optional: true, reloadOnChange: false)
                 .AddJsonFile(Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), SettingsFileName), optional: true, reloadOnChange: false)
                 .Build();
