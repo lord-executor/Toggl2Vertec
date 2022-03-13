@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using Toggl2Vertec.Configuration;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Tracking;
 
@@ -11,13 +9,14 @@ namespace Toggl2Vertec.Processors
 {
     public class ProjectFilter : IWorkingDayProcessor
     {
-        private static readonly Regex _vertecExp = new Regex("([0-9-]+-[0-9-]+-[0-9-]+)");
+        private readonly Regex _vertecExp;
 
         private readonly ICliLogger _logger;
 
-        public ProjectFilter(ICliLogger logger)
+        public ProjectFilter(Settings settings, ICliLogger logger)
         {
             _logger = logger;
+            _vertecExp = new Regex(settings.Toggl.VertecExpression);
         }
 
         public WorkingDay Process(WorkingDay workingDay)

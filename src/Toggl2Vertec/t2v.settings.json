@@ -1,7 +1,8 @@
 {
   "Toggl": {
     "BaseUrl": "https://api.track.toggl.com",
-    "CredentialsKey": "Toggl Token"
+    "CredentialsKey": "Toggl Token",
+    "VertecExpression": "(\\w+-\\w+-\\w+)"
   },
   "Vertec": {
     "Version": "6.5",
