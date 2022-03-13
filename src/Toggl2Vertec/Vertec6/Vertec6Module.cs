@@ -10,7 +10,7 @@ namespace Toggl2Vertec.Vertec6
         {
             Bind<XmlApiClient>().ToSelf();
             Bind<IVertecUpdateProcessor>().To<UpdateProcessor>()
-                .When(req => req.ParentContext.Kernel.Get<Settings>().Vertec.Version == "6.5")
+                .WhenSettings(settings => settings.Vertec.Version == "6.5")
                 .InTransientScope();
         }
     }
