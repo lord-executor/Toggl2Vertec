@@ -1,7 +1,8 @@
-﻿using Toggl2Vertec.Configuration;
+﻿using Toggl2Vertec.Commands.Check;
+using Toggl2Vertec.Configuration;
 using Toggl2Vertec.Logging;
 
-namespace Toggl2Vertec.Commands.Check
+namespace Toggl2Vertec.Toggl
 {
     public class TogglCredentialCheck : BaseCheckStep
     {

@@ -22,11 +22,6 @@ namespace Toggl2Vertec.Commands.Check
         {
             base.Bind(kernel);
 
-            kernel.Bind<TogglCredentialCheck>().ToSelf().InTransientScope();
-            kernel.Bind<VertecCredentialCheck>().ToSelf().InTransientScope();
-            kernel.Bind<TogglAccessCheck>().ToSelf().InTransientScope();
-            kernel.Bind<VertecAccessCheck>().ToSelf().InTransientScope();
-
             return this;
         }
 
@@ -47,16 +42,7 @@ namespace Toggl2Vertec.Commands.Check
             {
                 _logger.LogContent("Checking configuration...");
 
-                var checks = new List<CheckGroup> {
-                    new CheckGroup(_resolutionRoot, "Missing credentials. Aborting check.", 
-                        typeof(TogglCredentialCheck),
-                        typeof(VertecCredentialCheck)
-                    ),
-                    new CheckGroup(_resolutionRoot, "Access to target systems failed.",
-                        typeof(TogglAccessCheck),
-                        typeof(VertecAccessCheck)
-                    )
-                };
+                var checks = CheckGroupType.CreateCheckGroups(_resolutionRoot);
 
                 foreach (var group in checks)
                 {

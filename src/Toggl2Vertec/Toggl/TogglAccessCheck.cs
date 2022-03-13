@@ -1,8 +1,8 @@
 ﻿using System;
+using Toggl2Vertec.Commands.Check;
 using Toggl2Vertec.Logging;
-using Toggl2Vertec.Toggl;
 
-namespace Toggl2Vertec.Commands.Check
+namespace Toggl2Vertec.Toggl
 {
     public class TogglAccessCheck : BaseCheckStep
     {
