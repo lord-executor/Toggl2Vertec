@@ -1,5 +1,5 @@
-﻿using Ninject;
-using Ninject.Modules;
+﻿using Ninject.Modules;
+using Toggl2Vertec.Commands.Check;
 using Toggl2Vertec.Configuration;
 
 namespace Toggl2Vertec.Vertec6
@@ -10,8 +10,22 @@ namespace Toggl2Vertec.Vertec6
         {
             Bind<XmlApiClient>().ToSelf();
             Bind<IVertecUpdateProcessor>().To<UpdateProcessor>()
-                .WhenSettings(settings => settings.Vertec.Version == "6.5")
+                .WhenSettings(IsVertec6)
                 .InTransientScope();
+
+            Bind<ICheckStep>().To<VertecCredentialCheck>()
+                .WhenSettings(IsVertec6)
+                .InTransientScope()
+                .WithMetadata("group", CheckGroupType.Credentials.Key);
+            Bind<ICheckStep>().To<VertecAccessCheck>()
+                .WhenSettings(IsVertec6)
+                .InTransientScope()
+                .WithMetadata("group", CheckGroupType.Access.Key);
+        }
+
+        private static bool IsVertec6(Settings settings)
+        {
+            return settings.Vertec.Version == "6.5";
         }
     }
 }
