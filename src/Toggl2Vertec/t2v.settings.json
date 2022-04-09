@@ -6,7 +6,7 @@
   },
   "Vertec": {
     "Version": "6.5",
-    "BaseUrl": "https://v6cloudsrv2ppr",
+    "BaseUrl": "https://erpcld.elcaNet.local",
     "CredentialsKey": "Vertec Login"
   },
   "Processors": [
