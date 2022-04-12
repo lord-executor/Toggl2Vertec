@@ -2,6 +2,7 @@
 using System;
 using System.CommandLine;
 using Toggl2Vertec.Commands.Check;
+using Toggl2Vertec.Commands.Credentials;
 using Toggl2Vertec.Commands.List;
 using Toggl2Vertec.Commands.Update;
 using Toggl2Vertec.Configuration;
@@ -35,7 +36,9 @@ namespace Toggl2Vertec
                 new CheckCommand().Bind(kernel),
                 new ListCommand().Bind(kernel),
                 new UpdateCommand().Bind(kernel),
+                new CredentialsCommand().Bind(kernel)
             };
+            rootCommand.Description = "Synchronizes time entries from Toggl (Trac) to Vertec";
 
             try
             {

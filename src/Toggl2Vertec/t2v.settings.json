@@ -1,13 +1,13 @@
 {
   "Toggl": {
     "BaseUrl": "https://api.track.toggl.com",
-    "CredentialsKey": "Toggl Token",
+    "CredentialsKey": "t2v:toggl",
     "VertecExpression": "(\\w+-\\w+-\\w+)"
   },
   "Vertec": {
     "Version": "6.5",
     "BaseUrl": "https://erpcld.elcaNet.local",
-    "CredentialsKey": "Vertec Login"
+    "CredentialsKey": "t2v:vertec"
   },
   "Processors": [
     {
