@@ -4,7 +4,6 @@
 
 * `t2v sickday` - records a sickday in Vertec
 * `t2v holiday [from-date] [to-date]` - records holidays in Vertec
-* `t2v config <URLToConfigTemplate>`
 
 ## Others
 
