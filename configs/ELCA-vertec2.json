@@ -11,7 +11,10 @@
   },
   "Processors": [
     {
-      "Name": "ProjectFilter"
+      "Name": "ProjectFilter",
+      "WarnDuplicate": false,
+      "WarnMissingProject": true,
+      "WarnMissingVertecNumber": true
     },
     {
       "Name": "SummaryRounding",
