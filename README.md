@@ -24,6 +24,11 @@ Install Toggl2Vertec
 scoop install https://raw.githubusercontent.com/lord-executor/Toggl2Vertec/main/t2v.json
 ```
 
+When you run `scoop update`, it will also look for Toggl2Vertec updates, but if you want to _only_ update Toggl2Vertec, do this
+```
+scoop update t2v
+```
+
 ## Manual
 For manual installation, see the [Build From Source](#build-from-source)
 
@@ -65,7 +70,7 @@ t2v update 2022-05-25
 ```
 
 # Configuring Toggl
-Toggl2Vertec tries to match every Toggl entry that it finds with a Vertec project. In order to do that, you need to actually include that information in your Toggl configuration and the way to do that is to add it to your Toggl project names. Based on the regular expression configured in `$.Toggl.VertecExpression` it will check every entry for the presence of a Vertec project ID (or "phase"). All the entries that are using the same project are aggregated into one Vertec entry, joining all the individual entry texts with a separating ";".
+Toggl2Vertec tries to match every Toggl entry that it finds with a Vertec project. In order to do that, you need to actually include that information in your Toggl configuration and the way to do that is to add it to your Toggl project names. Based on the regular expression configured in `$.Toggl.Processors[?(@.Name == 'ProjectFilter')].VertecExpression` it will check every entry for the presence of a Vertec project ID (or "phase"). All the entries that are using the same project are aggregated into one Vertec entry, joining all the individual entry texts with a separating ";".
 
 Since the pattern is configurable, everybody can use their own conventions, as long as it is part of the project name.
 
