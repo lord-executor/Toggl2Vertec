@@ -39,7 +39,7 @@ To find your Toggl API token, you can go to your Toggl profile under https://tra
 t2v credentials
 ```
 
-To get a reasonable starting configuration this repository contains a set of managed configurations under https://github.com/lord-executor/Toggl2Vertec/tree/main/src any of which you can install by chosing the right configuration file and then executing the following command
+To get a reasonable starting configuration this repository contains a set of managed configurations under https://github.com/lord-executor/Toggl2Vertec/tree/main/configs any of which you can install by chosing the right configuration file and then executing the following command
 ```
 t2v config https://raw.githubusercontent.com/lord-executor/Toggl2Vertec/main/configs/[YOUR-CHOSEN-CONFIG].json
 ```
