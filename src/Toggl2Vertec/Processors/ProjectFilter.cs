@@ -13,13 +13,13 @@ namespace Toggl2Vertec.Processors
         private readonly Regex _vertecExp;
 
         private readonly ICliLogger _logger;
-        private readonly ProjectFilterSettings _projectFilterSettings;
+        private readonly ProjectFilterSettings _settings;
 
-        public ProjectFilter(Settings settings, ICliLogger logger, ProjectFilterSettings projectFilterSettings)
+        public ProjectFilter(ICliLogger logger, ProjectFilterSettings settings)
         {
             _logger = logger;
-            _vertecExp = new Regex(settings.Toggl.VertecExpression);
-            _projectFilterSettings = projectFilterSettings;
+            _vertecExp = new Regex(settings.VertecExpression);
+            _settings = settings;
         }
 
         public WorkingDay Process(WorkingDay workingDay)
@@ -30,7 +30,7 @@ namespace Toggl2Vertec.Processors
             {
                 if (String.IsNullOrEmpty(summary.Title))
                 {
-                    if (_projectFilterSettings.WarnMissingProject)
+                    if (_settings.WarnMissingProject)
                     {
                         _logger.LogWarning($"Missing project for entry '{summary.TextLine}'");
                     }
@@ -40,7 +40,7 @@ namespace Toggl2Vertec.Processors
                 var match = _vertecExp.Match(summary.Title);
                 if (!match.Success)
                 {
-                    if (_projectFilterSettings.WarnMissingVertecNumber)
+                    if (_settings.WarnMissingVertecNumber)
                     {
                         _logger.LogWarning($"No Vertec number found for entry/entries or project '{summary.Title}'");
                     }
@@ -50,7 +50,7 @@ namespace Toggl2Vertec.Processors
 
                 if (summariesMap.ContainsKey(vertecProject))
                 {
-                    if (_projectFilterSettings.WarnDuplicate)
+                    if (_settings.WarnDuplicate)
                     {
                         _logger.LogWarning($"Found multiple Toggl projects mapping to the same Vertec project '{vertecProject}'");
                     }
@@ -74,6 +74,7 @@ namespace Toggl2Vertec.Processors
         {
             private readonly ProcessorDefinition _processor;
 
+            public string VertecExpression { get; }
             public bool WarnDuplicate { get; }
             public bool WarnMissingProject { get; }
             public bool WarnMissingVertecNumber { get; }
@@ -81,6 +82,7 @@ namespace Toggl2Vertec.Processors
             public ProjectFilterSettings(ProcessorDefinition processor)
             {
                 _processor = processor;
+                VertecExpression = _processor.Section[nameof(VertecExpression)];
                 WarnDuplicate = bool.Parse(_processor.Section[nameof(WarnDuplicate)]);
                 WarnMissingProject = bool.Parse(_processor.Section[nameof(WarnMissingProject)]);
                 WarnMissingVertecNumber = bool.Parse(_processor.Section[nameof(WarnMissingVertecNumber)]);

@@ -1,8 +1,7 @@
 {
   "Toggl": {
     "BaseUrl": "https://api.track.toggl.com",
-    "CredentialsKey": "t2v:toggl",
-    "VertecExpression": "(\\w+-\\w+-\\w+)"
+    "CredentialsKey": "t2v:toggl"
   },
   "Vertec": {
     "Version": "6.5",
@@ -12,6 +11,7 @@
   "Processors": [
     {
       "Name": "ProjectFilter",
+      "VertecExpression": "(\\w+-\\w+-\\w+)",
       "WarnDuplicate": false,
       "WarnMissingProject": true,
       "WarnMissingVertecNumber": true
