@@ -1,5 +1,4 @@
-﻿using Ninject;
-using System;
+﻿using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
@@ -19,13 +18,6 @@ namespace Toggl2Vertec.Commands.Config
             AddOption(new Option<bool>("--verbose"));
             AddOption(new Option<bool>("--debug"));
             AddArgument(new Argument("configUrl", "URL of the configuration file to install"));
-        }
-
-        public override Command Bind(IKernel kernel)
-        {
-            base.Bind(kernel);
-
-            return this;
         }
 
         public class DefaultHandler : ICommandHandler<ConfigArgs>

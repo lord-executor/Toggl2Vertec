@@ -1,5 +1,4 @@
-﻿using Ninject;
-using System;
+﻿using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.Threading.Tasks;
@@ -20,13 +19,6 @@ namespace Toggl2Vertec.Commands.Credentials
             AddOption(new Option<bool>("--no-vertec", "Do not prompt Vertec password in interactive CLI mode"));
             AddOption(new Option<string>("--toggl", "Provide Toggl API key as the argument for non-interactive mode"));
             AddOption(new Option<string>("--vertec", "Provide Vertec username and password in URI 'userinfo' notation 'username:password'"));
-        }
-
-        public override Command Bind(IKernel kernel)
-        {
-            base.Bind(kernel);
-
-            return this;
         }
 
         public class DefaultHandler : ICommandHandler<CredentialArgs>

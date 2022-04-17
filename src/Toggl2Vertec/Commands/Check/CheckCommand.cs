@@ -1,6 +1,4 @@
-﻿using Ninject;
-using Ninject.Syntax;
-using System.Collections.Generic;
+﻿using Ninject.Syntax;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.Threading.Tasks;
@@ -16,13 +14,6 @@ namespace Toggl2Vertec.Commands.Check
         {
             AddOption(new Option<bool>("--verbose"));
             AddOption(new Option<bool>("--debug"));
-        }
-
-        public override Command Bind(IKernel kernel)
-        {
-            base.Bind(kernel);
-
-            return this;
         }
 
         public class DefaultHandler : ICommandHandler<DefaultArgs>

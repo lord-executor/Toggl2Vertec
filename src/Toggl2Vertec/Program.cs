@@ -40,7 +40,7 @@ namespace Toggl2Vertec
                 new CredentialsCommand().Bind(kernel),
                 new ConfigCommand().Bind(kernel),
             };
-            rootCommand.Description = "Synchronizes time entries from Toggl (Trac) to Vertec";
+            rootCommand.Description = "Synchronizes time entries from Toggl (Track) to Vertec";
 
             try
             {
