@@ -69,10 +69,12 @@ t2v update [DATE-IN-YYYY-MM-DD-FORM]
 t2v update 2022-05-25
 ```
 
+
 # Configuring Toggl
 Toggl2Vertec tries to match every Toggl entry that it finds with a Vertec project. In order to do that, you need to actually include that information in your Toggl configuration and the way to do that is to add it to your Toggl project names. Based on the regular expression configured in `$.Toggl.Processors[?(@.Name == 'ProjectFilter')].VertecExpression` it will check every entry for the presence of a Vertec project ID (or "phase"). All the entries that are using the same project are aggregated into one Vertec entry, joining all the individual entry texts with a separating ";".
 
 Since the pattern is configurable, everybody can use their own conventions, as long as it is part of the project name.
+
 
 # Reference
 
@@ -101,7 +103,115 @@ Commands:
 * `t2v --help [command]` - Prints description and all options for any given command
 
 ## Configuration
-TODO
+
+### Basics
+```json
+"Toggl": {
+  // Toggl Track API endpoint URL
+  "BaseUrl": "https://api.track.toggl.com",
+  // Target key for the Windows Credential Manager where the Toggl credentials are stored
+  "CredentialsKey": "t2v:toggl"
+},
+```
+
+```json
+  "Vertec": {
+    // Vertec Server version - currently supported are:
+    // * the very legacy "2" web UI
+    // * the new "6.5" XML API (should work for 6 and upwards, but 6.5 is the only one I can test with)
+    "Version": "2",
+    // Vertec web UI or XML API endpoint URL
+    "BaseUrl": "https://erp.elcanet.local",
+    // Target key for the Windows Credential Manager where the Vertec credentials are stored
+    "CredentialsKey": "t2v:vertec"
+  },
+```
+
+### Processors
+Most of the interesting things are implemented using _processors_. The data taken from Toggl is aggregated in a `WorkingDay` structure and then a sequence of processors are applied to that data and each processor can do some transformation on that data before it eventually tries to squish that data into the Vertec structure.
+
+In the end, only the `WorkingDay.Date`, `WorkingDay.Summaries` and `WorkingDay.Attendance` is relevant for updating Vertec. The `WorkingDay.Entries` which initially contains the raw, unmodified Toggl time entries is only used to guesstimate the attendance times.
+
+The configuration for the processors looks something like this:
+```json
+"Processors": [
+  {
+    "Name": "...",
+    // ...
+  },
+  {
+    "Name": "...",
+    // ...
+  },
+  // ...
+]
+```
+
+Every processor has a name and some specific configuration to control its behavior in more detail.
+
+**ProjectFilter**
+```json
+{
+  "Name": "ProjectFilter",
+  // Regular expression to match Vertec project / phase IDs in Toggl project names
+  "VertecExpression": "(\\w+-\\w+-\\w+)",
+  // Print a warning if there are multiple Toggl projects that refer to the same Vertec project
+  "WarnDuplicate": false,
+  // Warn if a Toggl time entry does not have a project associated with it
+  "WarnMissingProject": true,
+  // Warn if a Toggl project does not have a Vertec project / phase ID
+  "WarnMissingVertecNumber": true
+}
+```
+This filter is pretty much mandatory since it is the one that extracts the Vertec project / phase ID from the Toggl project name and it also groups multiple projects together. Depending on your Toggl configuration you may want to change the settings for the warnings to make sure you're not missing anything when updating your Vertec data.
+
+Regardless of whether the warnings are enabled or not, functionally any entry that cannot be associated with a Vertec project will be ignored.
+
+**SummaryRounding**
+```json
+{
+  "Name": "SummaryRounding",
+  // Rounding increment in minutes - round to the closest whole multiple of N minutes
+  "RoundToMinutes": 5
+}
+```
+This processor applies some simple rounding to the summaries which would otherwise be accurate to the second since Toggl tracks work time to the second. This **will** introduce some discrepancies to the attendance time unless you are using the same rounding accuracy for the _AttendanceProcessor_.
+
+**AttendanceProcessor**
+```json
+{
+  "Name": "AttendanceProcessor",
+  // Rounding increment in minutes - round to the closest whole multiple of N minutes
+  "RoundToMinutes": 5
+}
+```
+This processor calculates the attendance for Vertec. If this processor is not present, no attendance time will be calculated and sent to Vertec.
+
+Since the attendance data is based on the raw time entries and not on the pre-aggregated reporting data that is used for the summaries, there is a pretty good chance that the total time of the summaries is not the same as the total (rounded) time of the entries. To compensate for that, the _last_ attendance block will be automatically adjusted so that it all adds up in the end. Yes, this is a bit fuzzy, but on average it all works out pretty neatly.
+
+**ForceLunch**
+```json
+{
+  "Name": "ForceLunch",
+  // When to start an "imaginary" lunch break
+  "StartAt": "12:00",
+  // Number of minutes of the "imaginary" lunch break
+  "Duration": 30
+}
+```
+This is a feature for people that sometimes work though lunch and want that circumstance to remain _private_. Whenever the overall attendance is greater than 5 hours and consists of a single block of time that _includes_ the `StartAt` time, it will split the attendance into two blocks with a gap from the `StartAt` time that lasts for `Duration` minutes. Effectively this will shift the overall attendance end time by `Duration` minutes.
+
+This is just a convenient bit of "creative time tracking" and the processor can be removed from the configuration without any adverse side effects.
+
+**TextCommentFilter**
+```json
+{
+  "Name": "TextCommentFilter",
+  // Marker to start a private comment
+  "CommentMarker": "//"
+}
+```
+Normally, all the time entry texts for a given Vertec project are aggregated into a single line. This processor allows you to _exclude_ parts of the text from Vertec. By adding a comment marker into the text like `"public text // private text"`, only the part up to the comment marker will be kept and synchronized to Vertec.
 
 
 # Features
