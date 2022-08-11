@@ -26,7 +26,7 @@ $sha256 = (Get-FileHash -Algorithm SHA256 $releaseFile).Hash
 $manifest = Get-Content $manifestFile | ConvertFrom-Json
 $manifest.version = $version
 $manifest.hash = $sha256
-$manifest.url = $manifest.url -replace "/v\d\.\d\.\d/","/$gitTag/"
+$manifest.url = $manifest.url -replace "/v\d+\.\d+\.\d+/","/$gitTag/"
 $manifest | ConvertTo-Json > $manifestFile
 
 git add .
