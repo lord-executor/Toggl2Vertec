@@ -7,6 +7,7 @@ namespace Toggl2Vertec.Processors
     {
         public override void Load()
         {
+            RegisterProcessor<WorkingDayOutput>();
             RegisterProcessor<ProjectFilter>();
             RegisterProcessor<SummaryRounding>();
             RegisterProcessor<AttendanceProcessor>();

@@ -2,6 +2,7 @@
 using Ninject.Parameters;
 using Ninject.Syntax;
 using System;
+using System.Linq;
 using Toggl2Vertec.Configuration;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Toggl;
@@ -42,21 +43,6 @@ namespace Toggl2Vertec
             }
 
             return day;
-        }
-
-        public void PrintWorkingDay(WorkingDay workingDay)
-        {
-            _logger.LogContent($"Work Times (best guess):");
-            foreach (var entry in workingDay.Attendance)
-            {
-                _logger.LogContent($"{entry.Start.TimeOfDay} - {entry.End.TimeOfDay}");
-            }
-
-            _logger.LogContent($"Vertec Entries:");
-            foreach (var summary in workingDay.Summaries)
-            {
-                _logger.LogContent($"{summary.Title} => {Math.Round(summary.Duration.TotalMinutes)}min ({summary.TextLine})");
-            }
         }
 
         public void UpdateDayInVertec(WorkingDay workingDay)

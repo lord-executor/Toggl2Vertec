@@ -32,6 +32,12 @@
     {
       "Name": "TextCommentFilter",
       "CommentMarker": "//"
+    },
+    {
+      "Name": "WorkingDayOutput",
+      "WriteTotalWorkingTime": true,
+      "WriteWorkTimes": true,
+      "WriteVertecEntries": true
     }
   ]
 }
