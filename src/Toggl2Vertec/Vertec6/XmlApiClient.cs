@@ -44,9 +44,18 @@ namespace Toggl2Vertec.Vertec6
             _logger.LogInfo($"Calling {authUrl}");
 
             var response = await _httpClient.PostAsync(authUrl, login);
-            _token = await response.Content.ReadAsStringAsync();
+            var responseText = await response.Content.ReadAsStringAsync();
 
-            _logger.LogInfo($"Authentication token: {_token}");
+            if (response.IsSuccessStatusCode)
+            {
+                _token = responseText;
+                _logger.LogInfo($"Authentication token: {_token}");
+            }
+            else
+            {
+                _logger.LogError($"Authentication failed: {responseText}");
+                throw new Exception($"Vertec authentication failed with response: {responseText}");
+            }
         }
 
         public async Task<ApiResult> Request(Request request)

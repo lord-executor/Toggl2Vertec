@@ -5,7 +5,7 @@
   },
   "Vertec": {
     "Version": "6.5",
-    "BaseUrl": "https://erpcld.elcaNet.local",
+    "BaseUrl": "https://erp.elcaNet.local",
     "CredentialsKey": "t2v:vertec"
   },
   "Processors": [
