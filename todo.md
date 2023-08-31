@@ -15,3 +15,6 @@
 - [ ] Show total work time and possibly colored _delta_ to required work time in summary output
 - [x] Implement summary output as a processor
 - [ ] change all files to file-scoped namespaces
+- [ ] remove support for Vertec 2
+- [ ] make everything async
+- [ ] argument to allow changes in previous months

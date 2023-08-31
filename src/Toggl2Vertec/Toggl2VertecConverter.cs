@@ -7,6 +7,7 @@ using Toggl2Vertec.Configuration;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Toggl;
 using Toggl2Vertec.Tracking;
+using Toggl2Vertec.Vertec6;
 
 namespace Toggl2Vertec
 {
@@ -17,6 +18,7 @@ namespace Toggl2Vertec
         private readonly Settings _settings;
         private readonly TogglClient _togglClient;
         private readonly IVertecUpdateProcessor _updateProcess;
+        private readonly ClearProcessor _clearProcessor;
 
 
         public Toggl2VertecConverter(
@@ -24,13 +26,15 @@ namespace Toggl2Vertec
             ICliLogger logger,
             Settings settings,
             TogglClient togglClient,
-            IVertecUpdateProcessor updateProcess
+            IVertecUpdateProcessor updateProcess,
+            ClearProcessor clearProcessor
         ) {
             _resolutionRoot = resolutionRoot;
             _logger = logger;
             _settings = settings;
             _togglClient = togglClient;
             _updateProcess = updateProcess;
+            _clearProcessor = clearProcessor;
         }
 
         public WorkingDay GetAndProcessWorkingDay(DateTime date)
@@ -48,6 +52,11 @@ namespace Toggl2Vertec
         public void UpdateDayInVertec(WorkingDay workingDay)
         {
             _updateProcess.Process(workingDay);
+        }
+
+        public void ClearDayInVertec(DateTime date)
+        {
+            _clearProcessor.Process(date);
         }
     }
 }

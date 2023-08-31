@@ -12,6 +12,9 @@ namespace Toggl2Vertec.Vertec6
             Bind<IVertecUpdateProcessor>().To<UpdateProcessor>()
                 .WhenSettings(IsVertec6)
                 .InTransientScope();
+            Bind<ClearProcessor>().ToSelf()
+                .WhenSettings(IsVertec6)
+                .InTransientScope();
 
             Bind<ICheckStep>().To<VertecCredentialCheck>()
                 .WhenSettings(IsVertec6)

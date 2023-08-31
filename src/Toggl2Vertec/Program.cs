@@ -2,6 +2,7 @@
 using System;
 using System.CommandLine;
 using Toggl2Vertec.Commands.Check;
+using Toggl2Vertec.Commands.Clear;
 using Toggl2Vertec.Commands.Config;
 using Toggl2Vertec.Commands.Credentials;
 using Toggl2Vertec.Commands.List;
@@ -37,6 +38,7 @@ namespace Toggl2Vertec
                 new CheckCommand().Bind(kernel),
                 new ListCommand().Bind(kernel),
                 new UpdateCommand().Bind(kernel),
+                new ClearCommand().Bind(kernel),
                 new CredentialsCommand().Bind(kernel),
                 new ConfigCommand().Bind(kernel),
             };
