@@ -8,6 +8,7 @@ namespace Toggl2Vertec.Vertec6.Api
         [XmlElement(Type = typeof(Query))]
         [XmlElement(Type = typeof(Create))]
         [XmlElement(Type = typeof(Update))]
+        [XmlElement(Type = typeof(Delete))]
         public Request Request { get; set; }
 
         [XmlArrayItem(Type = typeof(ProjektPhase))]

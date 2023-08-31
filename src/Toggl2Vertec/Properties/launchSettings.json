@@ -2,7 +2,7 @@
   "profiles": {
     "Toggl2Vertec": {
       "commandName": "Project",
-      "commandLineArgs": "update --debug"
+      "commandLineArgs": "clear 2023-08-30 --debug"
     }
   }
 }

@@ -37,6 +37,7 @@ namespace Toggl2Vertec
                 new CheckCommand().Bind(kernel),
                 new ListCommand().Bind(kernel),
                 new UpdateCommand().Bind(kernel),
+                new ClearCommand().Bind(kernel),
                 new CredentialsCommand().Bind(kernel),
                 new ConfigCommand().Bind(kernel),
             };
