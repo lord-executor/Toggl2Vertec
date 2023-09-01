@@ -1,6 +1,6 @@
 {
-  "version": "2.1.0",
-  "url": "https://github.com/lord-executor/Toggl2Vertec/releases/download/v2.1.0/t2v-win-x64.zip",
+  "version": "2.2.0",
+  "url": "https://github.com/lord-executor/Toggl2Vertec/releases/download/v2.2.0/t2v-win-x64.zip",
   "description": "Toggl Track to Vertec time entry synchronization tool",
   "bin": [
     [
@@ -10,5 +10,5 @@
   ],
   "license": "MIT",
   "homepage": "https://github.com/lord-executor/Toggl2Vertec",
-  "hash": "BBEF6516A41ED60FEEBFEF0EEFCFBD2871D3AD6B85D556A22A768E54F1735093"
+  "hash": "E80C0F8E1A1D0711FF67829F8E022282E92CDAE72737E4D4515DE6AD468F295F"
 }
