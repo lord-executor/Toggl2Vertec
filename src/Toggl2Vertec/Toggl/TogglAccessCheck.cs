@@ -15,11 +15,11 @@ namespace Toggl2Vertec.Toggl
 
         public override bool Check(ICliLogger logger)
         {
-            logger.LogPartial(logger.CreateText($"Checking Toggl API access (https://api.track.toggl.com/api/v8/me): "));
+            logger.LogPartial(logger.CreateText("Checking Toggl API access (https://api.track.toggl.com/api/v9/me): "));
             try
             {
                 var profile = _client.FetchProfileDetails();
-                if (profile.GetProperty("data").GetProperty("id").GetInt32() <= 0)
+                if (profile.GetProperty("id").GetInt32() <= 0)
                 {
                     throw new Exception("Did not receive an ID from user profile");
                 }

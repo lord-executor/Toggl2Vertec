@@ -3,6 +3,18 @@
     "Toggl2Vertec": {
       "commandName": "Project",
       "commandLineArgs": "clear --debug"
+    },
+    "check": {
+      "commandName": "Project",
+      "commandLineArgs": "check"
+    },
+    "list": {
+      "commandName": "Project",
+      "commandLineArgs": "list"
+    },
+    "update": {
+      "commandName": "Project",
+      "commandLineArgs": "update"
     }
   }
 }
