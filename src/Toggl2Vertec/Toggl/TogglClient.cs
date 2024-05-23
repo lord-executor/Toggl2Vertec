@@ -31,7 +31,7 @@ namespace Toggl2Vertec.Toggl
 
         public JsonElement FetchProfileDetails()
         {
-            return Fetch("/api/v8/me");
+            return Fetch("/api/v9/me");
         }
 
         public IEnumerable<SummaryGroup> FetchDailySummary(DateTime date)
@@ -68,7 +68,7 @@ namespace Toggl2Vertec.Toggl
             if (!_workspaceId.HasValue)
             {
                 var result = FetchProfileDetails();
-                _workspaceId = result.GetProperty("data").GetProperty("default_wid").GetInt32();
+                _workspaceId = result.GetProperty("default_workspace_id").GetInt32();
                 _logger.LogInfo($"Toggle Workspace ID: {_workspaceId.Value}");
             }
 
