@@ -245,7 +245,7 @@ cd toggl2vertec/src/Toggl2Vertec
 dotnet build
 ```
 
-## Convenient PowerShell Alias
+# Convenient PowerShell Alias
 To make the setup a bit more convenient, you can easily create an alias in your PowerShell Core to run the tool without having to navigate to the correct path first.
 
 Open your PowerShell profile in your favorite editor
@@ -270,3 +270,21 @@ With that done, you can run the tool by simply opening a new PowerShell and doin
 ```
 t2v list --verbose
 ```
+
+# Release Process
+
+1. Make sure the application works =P.
+2. Define the 3 part version number for the next release - we will call that `$version` below and use it as a PowerShell
+   variable. The version number does not include a leading "v" here, so "2.2.0" is a valid version number.
+3. Publish the application with `dotnet publish -p:Version=$version -r win-x64`.
+4. From the published files, take the \*.exe and \*.pdb file and create a ZIP archive called `t2v-win-x64` from them.
+5. Get the SHA-256 hash of that file by running `Get-FileHash -Algorithm SHA256 ".\t2v-win-x64.zip"` on that file.
+6. Update the `t2v.json` file in the repository root to refer to the new version in both the `version` and the `url`
+   property and insert the SHA-256 hash from the previous step in the `hash` property.
+7. Commit the current changes to the `t2v.json` config file.
+8. Tag that commit with `git tag "v$version"` (here, we include the leading "v").
+9. Push the changes with `git push` and `git push --tags`
+10. On GitHub, go to [Releases](https://github.com/lord-executor/Toggl2Vertec/releases) and draft a new release from
+    the tag that we just created. Make sure that the title of the release matches the git tag.
+11. Write the release notes and attach the previously created ZIP archive to the release, then publish the release.
+12. Get the new release with `scoop update t2v`.
