@@ -23,6 +23,11 @@ namespace Toggl2Vertec.Ninject
             }
         }
 
+        public int Invoke(InvocationContext context)
+        {
+            return InvokeAsync(context).GetAwaiter().GetResult();
+        }
+
         public Task<int> InvokeAsync(InvocationContext context)
         {
             var cmdArgs = _resolutionRoot.Get<TArg>();

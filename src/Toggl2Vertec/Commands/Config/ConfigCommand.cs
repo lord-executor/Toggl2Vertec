@@ -17,7 +17,7 @@ namespace Toggl2Vertec.Commands.Config
         {
             AddOption(new Option<bool>("--verbose"));
             AddOption(new Option<bool>("--debug"));
-            AddArgument(new Argument("configUrl", "URL of the configuration file to install"));
+            AddArgument(new Argument<string>("configUrl", "URL of the configuration file to install"));
         }
 
         public class DefaultHandler : ICommandHandler<ConfigArgs>
