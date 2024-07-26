@@ -4,22 +4,21 @@ using System;
 using System.IO;
 using System.Reflection;
 
-namespace Toggl2Vertec.Configuration
+namespace Toggl2Vertec.Configuration;
+
+public class ConfigurationModule : NinjectModule
 {
-    public class ConfigurationModule : NinjectModule
+    public const string SettingsFileName = "t2v.settings.json";
+
+    public override void Load()
     {
-        public const string SettingsFileName = "t2v.settings.json";
+        var config = new ConfigurationBuilder()
+            .SetBasePath(Path.GetDirectoryName(System.AppContext.BaseDirectory))
+            .AddJsonFile(SettingsFileName, optional: true, reloadOnChange: false)
+            .AddJsonFile(Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), SettingsFileName), optional: true, reloadOnChange: false)
+            .Build();
 
-        public override void Load()
-        {
-            var config = new ConfigurationBuilder()
-                .SetBasePath(Path.GetDirectoryName(System.AppContext.BaseDirectory))
-                .AddJsonFile(SettingsFileName, optional: true, reloadOnChange: false)
-                .AddJsonFile(Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), SettingsFileName), optional: true, reloadOnChange: false)
-                .Build();
-
-            Bind<IConfiguration>().ToConstant(config).InSingletonScope();
-            Bind<Settings>().ToSelf().InSingletonScope();
-        }
+        Bind<IConfiguration>().ToConstant(config).InSingletonScope();
+        Bind<Settings>().ToSelf().InSingletonScope();
     }
 }

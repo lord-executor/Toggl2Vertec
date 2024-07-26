@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Text.Json;
 
-namespace Toggl2Vertec.Vertec
+namespace Toggl2Vertec.Vertec;
+
+public class VertecRowWriter
 {
-    public class VertecRowWriter
+    public void WriteTo(Utf8JsonWriter writer, DateTime date, IEnumerable<VertecEntry> entries)
     {
-        public void WriteTo(Utf8JsonWriter writer, DateTime date, IEnumerable<VertecEntry> entries)
-        {
             writer.WriteStartArray();
 
             foreach (var entry in entries)
@@ -31,5 +31,4 @@ namespace Toggl2Vertec.Vertec
 
             writer.WriteEndArray();
         }
-    }
 }

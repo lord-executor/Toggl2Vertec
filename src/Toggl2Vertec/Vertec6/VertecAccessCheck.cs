@@ -2,19 +2,19 @@
 using Toggl2Vertec.Commands.Check;
 using Toggl2Vertec.Logging;
 
-namespace Toggl2Vertec.Vertec6
-{
-    public class VertecAccessCheck : BaseCheckStep
-    {
-        private readonly XmlApiClient _client;
+namespace Toggl2Vertec.Vertec6;
 
-        public VertecAccessCheck(XmlApiClient client)
-        {
+public class VertecAccessCheck : BaseCheckStep
+{
+    private readonly XmlApiClient _client;
+
+    public VertecAccessCheck(XmlApiClient client)
+    {
             _client = client;
         }
 
-        public override bool Check(ICliLogger logger)
-        {
+    public override bool Check(ICliLogger logger)
+    {
             logger.LogPartial(logger.CreateText($"Checking Vertec Login: "));
 
             try
@@ -28,5 +28,4 @@ namespace Toggl2Vertec.Vertec6
                 return false;
             }
         }
-    }
 }

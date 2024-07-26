@@ -2,14 +2,14 @@
 using System.Linq;
 using Toggl2Vertec.Vertec6.Api;
 
-namespace Toggl2Vertec.Vertec6.Requests
-{
-    public class GetPhaseMap : IRequest<IDictionary<string, long>>
-    {
-        private readonly Query _query;
+namespace Toggl2Vertec.Vertec6.Requests;
 
-        public GetPhaseMap(IEnumerable<string> phaseCodes)
-        {
+public class GetPhaseMap : IRequest<IDictionary<string, long>>
+{
+    private readonly Query _query;
+
+    public GetPhaseMap(IEnumerable<string> phaseCodes)
+    {
             var codeList = string.Join(',', phaseCodes.Select(code => $"'{code}'"));
             _query = new Query
             {
@@ -22,8 +22,8 @@ namespace Toggl2Vertec.Vertec6.Requests
             };
         }
 
-        public IDictionary<string, long> Execute(XmlApiClient client)
-        {
+    public IDictionary<string, long> Execute(XmlApiClient client)
+    {
             var projects = client.Request(_query).Result.GetResults<ProjektPhase>();
 
             return projects
@@ -32,5 +32,4 @@ namespace Toggl2Vertec.Vertec6.Requests
                     phase => phase.ObjId.Value
                 );
         }
-    }
 }

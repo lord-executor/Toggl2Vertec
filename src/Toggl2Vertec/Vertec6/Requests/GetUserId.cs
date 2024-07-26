@@ -1,13 +1,13 @@
 ﻿using Toggl2Vertec.Vertec6.Api;
 
-namespace Toggl2Vertec.Vertec6.Requests
-{
-    public class GetUserId : IRequest<long>
-    {
-        private readonly Query _query;
+namespace Toggl2Vertec.Vertec6.Requests;
 
-        public GetUserId(string userCode)
-        {
+public class GetUserId : IRequest<long>
+{
+    private readonly Query _query;
+
+    public GetUserId(string userCode)
+    {
             _query = new Query
             {
                 Selection = new Selection
@@ -18,10 +18,9 @@ namespace Toggl2Vertec.Vertec6.Requests
             };
         }
 
-        public long Execute(XmlApiClient client)
-        {
+    public long Execute(XmlApiClient client)
+    {
             var doc = client.Request(_query).Result.GetDocument();
             return long.Parse(doc.SelectSingleNode("//Projektbearbeiter/objid").InnerText);
         }
-    }
 }

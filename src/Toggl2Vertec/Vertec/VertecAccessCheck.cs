@@ -3,19 +3,19 @@ using System.Threading;
 using Toggl2Vertec.Commands.Check;
 using Toggl2Vertec.Logging;
 
-namespace Toggl2Vertec.Vertec
-{
-    public class VertecAccessCheck : BaseCheckStep
-    {
-        private readonly VertecClient _client;
+namespace Toggl2Vertec.Vertec;
 
-        public VertecAccessCheck(VertecClient client)
-        {
+public class VertecAccessCheck : BaseCheckStep
+{
+    private readonly VertecClient _client;
+
+    public VertecAccessCheck(VertecClient client)
+    {
             _client = client;
         }
 
-        public override bool Check(ICliLogger logger)
-        {
+    public override bool Check(ICliLogger logger)
+    {
             var attempt = 0;
             do
             {
@@ -36,5 +36,4 @@ namespace Toggl2Vertec.Vertec
 
             return attempt != 6;
         }
-    }
 }

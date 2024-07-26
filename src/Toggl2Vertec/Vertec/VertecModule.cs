@@ -2,12 +2,12 @@
 using Toggl2Vertec.Commands.Check;
 using Toggl2Vertec.Configuration;
 
-namespace Toggl2Vertec.Vertec
+namespace Toggl2Vertec.Vertec;
+
+public class VertecModule : NinjectModule
 {
-    public class VertecModule : NinjectModule
+    public override void Load()
     {
-        public override void Load()
-        {
             Bind<VertecClient>().ToSelf().InTransientScope();
             Bind<IVertecUpdateProcessor>().To<UpdateProcessor>()
                 .WhenSettings(IsVertec2)
@@ -23,9 +23,8 @@ namespace Toggl2Vertec.Vertec
                 .WithMetadata("group", CheckGroupType.Access.Key);
         }
 
-        private static bool IsVertec2(Settings settings)
-        {
+    private static bool IsVertec2(Settings settings)
+    {
             return settings.Vertec.Version == "2";
         }
-    }
 }

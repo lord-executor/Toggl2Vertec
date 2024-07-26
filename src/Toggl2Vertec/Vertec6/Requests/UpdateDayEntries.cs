@@ -3,21 +3,21 @@ using System.Linq;
 using Toggl2Vertec.Tracking;
 using Toggl2Vertec.Vertec6.Api;
 
-namespace Toggl2Vertec.Vertec6.Requests
-{
-    public class UpdateDayEntries : IRequest<bool>
-    {
-        private readonly WorkingDay _workingDay;
-        private readonly long _ownerId;
+namespace Toggl2Vertec.Vertec6.Requests;
 
-        public UpdateDayEntries(WorkingDay workingDay, long ownerId)
-        {
+public class UpdateDayEntries : IRequest<bool>
+{
+    private readonly WorkingDay _workingDay;
+    private readonly long _ownerId;
+
+    public UpdateDayEntries(WorkingDay workingDay, long ownerId)
+    {
             _workingDay = workingDay;
             _ownerId = ownerId;
         }
 
-        public bool Execute(XmlApiClient client)
-        {
+    public bool Execute(XmlApiClient client)
+    {
             var phases = _workingDay.Summaries.Select(summary => summary.Title).ToList();
 
             var phaseMap = new GetPhaseMap(phases).Execute(client);
@@ -63,5 +63,4 @@ namespace Toggl2Vertec.Vertec6.Requests
 
             return true;
         }
-    }
 }

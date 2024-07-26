@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace Toggl2Vertec.Vertec6.Api
+namespace Toggl2Vertec.Vertec6.Api;
+
+public class Delete : Request
 {
-    public class Delete : Request
-    {
-        [XmlElement("objref")]
-        public List<long> Items { get; set; }
-    }
+    [XmlElement("objref")]
+    public List<long> Items { get; set; }
 }

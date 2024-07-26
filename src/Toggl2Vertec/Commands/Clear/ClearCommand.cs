@@ -6,42 +6,41 @@ using Toggl2Vertec.Logging;
 using Toggl2Vertec.Ninject;
 using Toggl2Vertec.Vertec6;
 
-namespace Toggl2Vertec.Commands.Clear
+namespace Toggl2Vertec.Commands.Clear;
+
+public class ClearCommand : CustomCommand<SyncArgs>
 {
-    public class ClearCommand : CustomCommand<SyncArgs>
+    public ClearCommand()
+        : base("clear", "clears a day in Vertec", typeof(DefaultHandler))
     {
-        public ClearCommand()
-            : base("clear", "clears a day in Vertec", typeof(DefaultHandler))
+        AddArgument(new Argument<DateTime>("date", () => DateTime.Today));
+        AddOption(new Option<bool>("--verbose"));
+        AddOption(new Option<bool>("--debug"));
+    }
+
+    public class DefaultHandler : ICommandHandler<SyncArgs>
+    {
+        private readonly ICliLogger _logger;
+        private readonly ClearProcessor _clearProcessor;
+
+        public DefaultHandler(ICliLogger logger, ClearProcessor clearProcessor)
         {
-            AddArgument(new Argument<DateTime>("date", () => DateTime.Today));
-            AddOption(new Option<bool>("--verbose"));
-            AddOption(new Option<bool>("--debug"));
+            _logger = logger;
+            _clearProcessor = clearProcessor;
         }
 
-        public class DefaultHandler : ICommandHandler<SyncArgs>
+        public Task<int> InvokeAsync(InvocationContext context, SyncArgs args)
         {
-            private readonly ICliLogger _logger;
-            private readonly ClearProcessor _clearProcessor;
-
-            public DefaultHandler(ICliLogger logger, ClearProcessor clearProcessor)
+            if (args.Date.Month < DateTime.Now.Month && (!args.TargetDate.HasValue || args.TargetDate.Value.Month < DateTime.Now.Month))
             {
-                _logger = logger;
-                _clearProcessor = clearProcessor;
+                _logger.LogError("Date cannot be in the past month (already validated in Vertec).");
+                return Task.FromResult(ResultCodes.InvalidDate);
             }
 
-            public Task<int> InvokeAsync(InvocationContext context, SyncArgs args)
-            {
-                if (args.Date.Month < DateTime.Now.Month && (!args.TargetDate.HasValue || args.TargetDate.Value.Month < DateTime.Now.Month))
-                {
-                    _logger.LogError("Date cannot be in the past month (already validated in Vertec).");
-                    return Task.FromResult(ResultCodes.InvalidDate);
-                }
+            _logger.LogContent($"Clearing data for {args.Date.ToDateString()}...");
+            _clearProcessor.Process(args.Date);
 
-                _logger.LogContent($"Clearing data for {args.Date.ToDateString()}...");
-                _clearProcessor.Process(args.Date);
-
-                return Task.FromResult(ResultCodes.Ok);
-            }
+            return Task.FromResult(ResultCodes.Ok);
         }
     }
 }

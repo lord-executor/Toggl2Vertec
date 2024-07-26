@@ -4,24 +4,24 @@ using Toggl2Vertec.Configuration;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Tracking;
 
-namespace Toggl2Vertec.Vertec
-{
-    public class UpdateProcessor : IVertecUpdateProcessor
-    {
-        private readonly ICliLogger _logger;
-        private readonly VertecClient _vertecClient;
+namespace Toggl2Vertec.Vertec;
 
-        public UpdateProcessor(
-            ICliLogger logger,
-            VertecClient vertecClient
-        )
-        {
+public class UpdateProcessor : IVertecUpdateProcessor
+{
+    private readonly ICliLogger _logger;
+    private readonly VertecClient _vertecClient;
+
+    public UpdateProcessor(
+        ICliLogger logger,
+        VertecClient vertecClient
+    )
+    {
             _logger = logger;
             _vertecClient = vertecClient;
         }
 
-        public void Process(WorkingDay workingDay)
-        {
+    public void Process(WorkingDay workingDay)
+    {
             _vertecClient.Login();
 
             if (workingDay.Summaries.Any())
@@ -56,8 +56,8 @@ namespace Toggl2Vertec.Vertec
             }
         }
 
-        private (IList<VertecEntry> Matches, IList<SummaryGroup> Remainder) Partition(IDictionary<string, VertecProject> projects, IEnumerable<SummaryGroup> entries)
-        {
+    private (IList<VertecEntry> Matches, IList<SummaryGroup> Remainder) Partition(IDictionary<string, VertecProject> projects, IEnumerable<SummaryGroup> entries)
+    {
             var matches = new List<VertecEntry>();
             var remainder = new List<SummaryGroup>();
 
@@ -75,5 +75,4 @@ namespace Toggl2Vertec.Vertec
 
             return (matches, remainder);
         }
-    }
 }

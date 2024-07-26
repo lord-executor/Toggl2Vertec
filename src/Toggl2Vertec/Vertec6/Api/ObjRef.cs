@@ -1,15 +1,14 @@
 ﻿using System.Xml.Serialization;
 
-namespace Toggl2Vertec.Vertec6.Api
-{
-    public class ObjRef
-    {
-        [XmlElement(ElementName = "objref")]
-        public long Target { get; set; }
+namespace Toggl2Vertec.Vertec6.Api;
 
-        public static implicit operator ObjRef(long target)
-        {
-            return new ObjRef { Target = target };
-        }
+public class ObjRef
+{
+    [XmlElement(ElementName = "objref")]
+    public long Target { get; set; }
+
+    public static implicit operator ObjRef(long target)
+    {
+        return new ObjRef { Target = target };
     }
 }

@@ -5,37 +5,36 @@ using System.Threading.Tasks;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Ninject;
 
-namespace Toggl2Vertec.Commands.List
+namespace Toggl2Vertec.Commands.List;
+
+public class ListCommand : CustomCommand<SyncArgs>
 {
-    public class ListCommand : CustomCommand<SyncArgs>
+    public ListCommand()
+        : base("list", "lists the aggregated data from Toggl in Vertec form", typeof(DefaultHandler))
     {
-        public ListCommand()
-            : base("list", "lists the aggregated data from Toggl in Vertec form", typeof(DefaultHandler))
+        AddArgument(new Argument<DateTime>("date", () => DateTime.Today));
+        AddOption(new Option<bool>("--verbose"));
+        AddOption(new Option<bool>("--debug"));
+    }
+
+    public class DefaultHandler : ICommandHandler<SyncArgs>
+    {
+        private readonly ICliLogger _logger;
+        private readonly Toggl2VertecConverter _converter;
+
+        public DefaultHandler(ICliLogger logger, Toggl2VertecConverter converter)
         {
-            AddArgument(new Argument<DateTime>("date", () => DateTime.Today));
-            AddOption(new Option<bool>("--verbose"));
-            AddOption(new Option<bool>("--debug"));
+            _logger = logger;
+            _converter = converter;
         }
 
-        public class DefaultHandler : ICommandHandler<SyncArgs>
+        public Task<int> InvokeAsync(InvocationContext context, SyncArgs args)
         {
-            private readonly ICliLogger _logger;
-            private readonly Toggl2VertecConverter _converter;
+            _logger.LogContent($"Collecting data for {args.Date.ToDateString()}");
 
-            public DefaultHandler(ICliLogger logger, Toggl2VertecConverter converter)
-            {
-                _logger = logger;
-                _converter = converter;
-            }
+            var workingDay = _converter.GetAndProcessWorkingDay(args.Date);
 
-            public Task<int> InvokeAsync(InvocationContext context, SyncArgs args)
-            {
-                _logger.LogContent($"Collecting data for {args.Date.ToDateString()}");
-
-                var workingDay = _converter.GetAndProcessWorkingDay(args.Date);
-
-                return Task.FromResult(ResultCodes.Ok);
-            }
+            return Task.FromResult(ResultCodes.Ok);
         }
     }
 }

@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace Toggl2Vertec.Vertec6.Api
-{
-    public class Query : Request
-    {
-        public Selection Selection { get; set; }
+namespace Toggl2Vertec.Vertec6.Api;
 
-        [XmlArray(ElementName = "Resultdef")]
-        [XmlArrayItem(ElementName = "member")]
-        public List<string> Members { get; set; }
-    }
+public class Query : Request
+{
+    public Selection Selection { get; set; }
+
+    [XmlArray(ElementName = "Resultdef")]
+    [XmlArrayItem(ElementName = "member")]
+    public List<string> Members { get; set; }
 }

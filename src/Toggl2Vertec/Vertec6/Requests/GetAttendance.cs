@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using Toggl2Vertec.Vertec6.Api;
 
-namespace Toggl2Vertec.Vertec6.Requests
-{
-    public class GetAttendance : IRequest<IEnumerable<PraesenzZeit>>
-    {
-        private readonly Query _query;
+namespace Toggl2Vertec.Vertec6.Requests;
 
-        public GetAttendance(DateTime date, long ownerId)
-        {
+public class GetAttendance : IRequest<IEnumerable<PraesenzZeit>>
+{
+    private readonly Query _query;
+
+    public GetAttendance(DateTime date, long ownerId)
+    {
             var dateStr = date.ToDateString();
 
             _query = new Query
@@ -23,9 +23,8 @@ namespace Toggl2Vertec.Vertec6.Requests
             };
         }
 
-        public IEnumerable<PraesenzZeit> Execute(XmlApiClient client)
-        {
+    public IEnumerable<PraesenzZeit> Execute(XmlApiClient client)
+    {
             return client.Request(_query).Result.GetResults<PraesenzZeit>();
         }
-    }
 }

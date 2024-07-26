@@ -1,12 +1,11 @@
 ﻿using Ninject.Modules;
 
-namespace Toggl2Vertec.Logging
+namespace Toggl2Vertec.Logging;
+
+public class LoggingModule : NinjectModule
 {
-    public class LoggingModule : NinjectModule
+    public override void Load()
     {
-        public override void Load()
-        {
-            Bind<ICliLogger>().To<CliLogger>();
-        }
+        Bind<ICliLogger>().To<CliLogger>();
     }
 }

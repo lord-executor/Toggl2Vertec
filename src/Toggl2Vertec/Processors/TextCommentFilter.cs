@@ -7,21 +7,21 @@ using Toggl2Vertec.Configuration;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Tracking;
 
-namespace Toggl2Vertec.Processors
-{
-    public class TextCommentFilter : IWorkingDayProcessor
-    {
-        private readonly ICliLogger _logger;
-        private readonly ProcessorSettings _settings;
+namespace Toggl2Vertec.Processors;
 
-        public TextCommentFilter(ICliLogger logger, ProcessorSettings settings)
-        {
+public class TextCommentFilter : IWorkingDayProcessor
+{
+    private readonly ICliLogger _logger;
+    private readonly ProcessorSettings _settings;
+
+    public TextCommentFilter(ICliLogger logger, ProcessorSettings settings)
+    {
             _logger = logger;
             _settings = settings;
         }
 
-        public WorkingDay Process(WorkingDay workingDay)
-        {
+    public WorkingDay Process(WorkingDay workingDay)
+    {
             workingDay.Summaries = workingDay.Summaries.Select(summary =>
             {
                 if (summary.Text.Any(text => text.Contains(_settings.CommentMarker)))
@@ -49,17 +49,16 @@ namespace Toggl2Vertec.Processors
             return workingDay;
         }
 
-        public class ProcessorSettings
+    public class ProcessorSettings
+    {
+        private readonly ProcessorDefinition _processor;
+
+        public string CommentMarker { get; }
+
+        public ProcessorSettings(ProcessorDefinition processor)
         {
-            private readonly ProcessorDefinition _processor;
-
-            public string CommentMarker { get; }
-
-            public ProcessorSettings(ProcessorDefinition processor)
-            {
                 _processor = processor;
                 CommentMarker = _processor.Section[nameof(CommentMarker)];
             }
-        }
     }
 }

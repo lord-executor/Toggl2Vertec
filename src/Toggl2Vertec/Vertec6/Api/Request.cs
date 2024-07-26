@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Toggl2Vertec.Vertec6.Api
+namespace Toggl2Vertec.Vertec6.Api;
+
+public abstract class Request
 {
-    public abstract class Request
-    {
-    }
 }

@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text.Json;
 using Toggl2Vertec.Tracking;
 
-namespace Toggl2Vertec.Vertec
+namespace Toggl2Vertec.Vertec;
+
+public class VertecAttendanceWriter
 {
-    public class VertecAttendanceWriter
+    public void WriteTo(Utf8JsonWriter writer, DateTime date, IEnumerable<WorkTimeSpan> times)
     {
-        public void WriteTo(Utf8JsonWriter writer, DateTime date, IEnumerable<WorkTimeSpan> times)
-        {
             writer.WriteStartArray();
 
             foreach ((var entry, var index) in times.Select((x, index) => (x, index)))
@@ -29,5 +29,4 @@ namespace Toggl2Vertec.Vertec
 
             writer.WriteEndArray();
         }
-    }
 }

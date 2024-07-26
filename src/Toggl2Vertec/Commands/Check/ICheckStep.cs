@@ -1,9 +1,8 @@
 ﻿using Toggl2Vertec.Logging;
 
-namespace Toggl2Vertec.Commands.Check
+namespace Toggl2Vertec.Commands.Check;
+
+public interface ICheckStep
 {
-    public interface ICheckStep
-    {
-        bool Check(ICliLogger logger);
-    }
+    bool Check(ICliLogger logger);
 }
