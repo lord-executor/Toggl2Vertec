@@ -12,6 +12,7 @@ public class ProcessorModule : NinjectModule
         RegisterProcessor<SummaryRounding>();
         RegisterProcessor<AttendanceProcessor>();
         RegisterProcessor<ForceLunch>();
+        RegisterProcessor<DontWorkTooEarly>();
         RegisterProcessor<TextCommentFilter>();
     }
 
