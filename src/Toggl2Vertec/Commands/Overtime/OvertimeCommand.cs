@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Ninject;
+using Toggl2Vertec.Vertec6;
 
 namespace Toggl2Vertec.Commands.Overtime;
 
@@ -21,15 +22,16 @@ public class OvertimeCommand : CustomCommand<OvertimeArgs>
     public class DefaultHandler : ICommandHandler<OvertimeArgs>
     {
         private readonly ICliLogger _logger;
+        private readonly OvertimeProcessor _overtimeProcessor;
 
-        public DefaultHandler(ICliLogger logger)
+        public DefaultHandler(ICliLogger logger, OvertimeProcessor overtimeProcessor)
         {
             _logger = logger;
+            _overtimeProcessor = overtimeProcessor;
         }
         
         public Task<int> InvokeAsync(InvocationContext context, OvertimeArgs args)
         {
-            var currentDate = DateTime.Today;
             if (args.Month is < 1 or > 12)
             {
                 _logger.LogError("Month must be between (including) 1 and 12.");
@@ -37,6 +39,8 @@ public class OvertimeCommand : CustomCommand<OvertimeArgs>
             }
 
             _logger.LogContent($"Gathering overtime data for {CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(args.Month)}");
+            _overtimeProcessor.Process(args.Month);
+            
             return Task.FromResult(ResultCodes.Ok);
         }
     }
