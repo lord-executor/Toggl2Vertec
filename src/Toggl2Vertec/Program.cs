@@ -15,12 +15,12 @@ using Toggl2Vertec.Toggl;
 using Toggl2Vertec.Vertec;
 using Toggl2Vertec.Vertec6;
 
-namespace Toggl2Vertec
+namespace Toggl2Vertec;
+
+public class Program
 {
-    public class Program
+    static int Main(string[] args)
     {
-        static int Main(string[] args)
-        {
             var kernel = new StandardKernel(
                 new ConfigurationModule(),
                 new LoggingModule(),
@@ -54,5 +54,4 @@ namespace Toggl2Vertec
                 return ResultCodes.UnhandledException;
             }
         }
-    }
 }

@@ -5,46 +5,45 @@ using System.Threading.Tasks;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Ninject;
 
-namespace Toggl2Vertec.Commands.Check
+namespace Toggl2Vertec.Commands.Check;
+
+public class CheckCommand : CustomCommand<DefaultArgs>
 {
-    public class CheckCommand : CustomCommand<DefaultArgs>
+    public CheckCommand()
+        : base("check", "checks configurations and tries to access Toggl and Vertec", typeof(DefaultHandler))
     {
-        public CheckCommand()
-            : base("check", "checks configurations and tries to access Toggl and Vertec", typeof(DefaultHandler))
-        {
-            AddOption(new Option<bool>("--verbose"));
-            AddOption(new Option<bool>("--debug"));
+        AddOption(new Option<bool>("--verbose"));
+        AddOption(new Option<bool>("--debug"));
+    }
+
+    public class DefaultHandler : ICommandHandler<DefaultArgs>
+    {
+        private readonly IResolutionRoot _resolutionRoot;
+        private readonly ICliLogger _logger;
+
+        public DefaultHandler(
+            IResolutionRoot resolutionRoot,
+            ICliLogger logger
+        ) {
+            _resolutionRoot = resolutionRoot;
+            _logger = logger;
         }
 
-        public class DefaultHandler : ICommandHandler<DefaultArgs>
+        public Task<int> InvokeAsync(InvocationContext context, DefaultArgs args)
         {
-            private readonly IResolutionRoot _resolutionRoot;
-            private readonly ICliLogger _logger;
+            _logger.LogContent("Checking configuration...");
 
-            public DefaultHandler(
-                IResolutionRoot resolutionRoot,
-                ICliLogger logger
-            ) {
-                _resolutionRoot = resolutionRoot;
-                _logger = logger;
-            }
+            var checks = CheckGroupType.CreateCheckGroups(_resolutionRoot);
 
-            public Task<int> InvokeAsync(InvocationContext context, DefaultArgs args)
+            foreach (var group in checks)
             {
-                _logger.LogContent("Checking configuration...");
-
-                var checks = CheckGroupType.CreateCheckGroups(_resolutionRoot);
-
-                foreach (var group in checks)
+                if (!group.Check(_logger))
                 {
-                    if (!group.Check(_logger))
-                    {
-                        return Task.FromResult(ResultCodes.CheckFailed);
-                    }
+                    return Task.FromResult(ResultCodes.CheckFailed);
                 }
-
-                return Task.FromResult(ResultCodes.Ok);
             }
+
+            return Task.FromResult(ResultCodes.Ok);
         }
     }
 }

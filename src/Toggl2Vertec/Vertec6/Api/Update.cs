@@ -1,6 +1,5 @@
-﻿namespace Toggl2Vertec.Vertec6.Api
+﻿namespace Toggl2Vertec.Vertec6.Api;
+
+public class Update : Modification
 {
-    public class Update : Modification
-    {
-    }
 }

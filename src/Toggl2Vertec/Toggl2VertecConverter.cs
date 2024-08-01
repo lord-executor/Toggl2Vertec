@@ -9,26 +9,26 @@ using Toggl2Vertec.Toggl;
 using Toggl2Vertec.Tracking;
 using Toggl2Vertec.Vertec6;
 
-namespace Toggl2Vertec
+namespace Toggl2Vertec;
+
+public class Toggl2VertecConverter
 {
-    public class Toggl2VertecConverter
-    {
-        private readonly IResolutionRoot _resolutionRoot;
-        private readonly ICliLogger _logger;
-        private readonly Settings _settings;
-        private readonly TogglClient _togglClient;
-        private readonly IVertecUpdateProcessor _updateProcess;
-        private readonly ClearProcessor _clearProcessor;
+    private readonly IResolutionRoot _resolutionRoot;
+    private readonly ICliLogger _logger;
+    private readonly Settings _settings;
+    private readonly TogglClient _togglClient;
+    private readonly IVertecUpdateProcessor _updateProcess;
+    private readonly ClearProcessor _clearProcessor;
 
 
-        public Toggl2VertecConverter(
-            IResolutionRoot resolutionRoot,
-            ICliLogger logger,
-            Settings settings,
-            TogglClient togglClient,
-            IVertecUpdateProcessor updateProcess,
-            ClearProcessor clearProcessor
-        ) {
+    public Toggl2VertecConverter(
+        IResolutionRoot resolutionRoot,
+        ICliLogger logger,
+        Settings settings,
+        TogglClient togglClient,
+        IVertecUpdateProcessor updateProcess,
+        ClearProcessor clearProcessor
+    ) {
             _resolutionRoot = resolutionRoot;
             _logger = logger;
             _settings = settings;
@@ -37,8 +37,8 @@ namespace Toggl2Vertec
             _clearProcessor = clearProcessor;
         }
 
-        public WorkingDay GetAndProcessWorkingDay(DateTime date)
-        {
+    public WorkingDay GetAndProcessWorkingDay(DateTime date)
+    {
             var day = WorkingDay.FromToggl(_togglClient, date);
             foreach (var processorDef in _settings.GetProcessors())
             {
@@ -49,14 +49,13 @@ namespace Toggl2Vertec
             return day;
         }
 
-        public void UpdateDayInVertec(WorkingDay workingDay)
-        {
+    public void UpdateDayInVertec(WorkingDay workingDay)
+    {
             _updateProcess.Process(workingDay);
         }
 
-        public void ClearDayInVertec(DateTime date)
-        {
+    public void ClearDayInVertec(DateTime date)
+    {
             _clearProcessor.Process(date);
         }
-    }
 }

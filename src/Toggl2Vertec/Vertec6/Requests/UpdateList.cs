@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using Toggl2Vertec.Vertec6.Api;
 
-namespace Toggl2Vertec.Vertec6.Requests
-{
-    public class UpdateList<T>
-        where T : Entity
-    {
-        private readonly Create _creates = new Create();
-        private readonly Update _updates = new Update();
+namespace Toggl2Vertec.Vertec6.Requests;
 
-        public void Register(T entity)
-        {
+public class UpdateList<T>
+    where T : Entity
+{
+    private readonly Create _creates = new Create();
+    private readonly Update _updates = new Update();
+
+    public void Register(T entity)
+    {
             if (entity.ObjIdSpecified)
             {
                 entity.IdToRef();
@@ -27,8 +27,8 @@ namespace Toggl2Vertec.Vertec6.Requests
             }
         }
 
-        public void Apply(XmlApiClient client)
-        {
+    public void Apply(XmlApiClient client)
+    {
             if (_updates.Entities.Count > 0)
             {
                 var updateResponse = client.Request(_updates).Result.GetDocument().SelectSingleNode("//UpdateResponse/text").InnerText;
@@ -46,5 +46,4 @@ namespace Toggl2Vertec.Vertec6.Requests
                 }
             }
         }
-    }
 }

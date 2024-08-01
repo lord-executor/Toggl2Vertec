@@ -9,31 +9,31 @@ using Toggl2Vertec.Configuration;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Vertec6.Api;
 
-namespace Toggl2Vertec.Vertec6
+namespace Toggl2Vertec.Vertec6;
+
+public class XmlApiClient
 {
-    public class XmlApiClient
+    private readonly string _baseUrl;
+    private readonly CredentialStore _credStore;
+    private readonly ICliLogger _logger;
+    private readonly HttpClient _httpClient;
+
+    private string _token;
+
+    public XmlApiClient(
+        Settings settings,
+        CredentialStore credStore,
+        ICliLogger logger
+    )
     {
-        private readonly string _baseUrl;
-        private readonly CredentialStore _credStore;
-        private readonly ICliLogger _logger;
-        private readonly HttpClient _httpClient;
-
-        private string _token;
-
-        public XmlApiClient(
-            Settings settings,
-            CredentialStore credStore,
-            ICliLogger logger
-        )
-        {
             _baseUrl = settings.Vertec.BaseUrl;
             _credStore = credStore;
             _logger = logger;
             _httpClient = new HttpClient();
         }
 
-        public async Task Authenticate()
-        {
+    public async Task Authenticate()
+    {
             var credentials = _credStore.VertecCredentials;
             var login = new FormUrlEncodedContent(new[] {
                 new KeyValuePair<string, string>("vertec_username", credentials.UserName),
@@ -58,8 +58,8 @@ namespace Toggl2Vertec.Vertec6
             }
         }
 
-        public async Task<ApiResult> Request(Request request)
-        {
+    public async Task<ApiResult> Request(Request request)
+    {
             var envelope = new Envelope();
             envelope.Header.BasicAuth.Token = _token;
             envelope.Body.Request = request;
@@ -97,5 +97,4 @@ namespace Toggl2Vertec.Vertec6
 
             return new ApiResult(result);
         }
-    }
 }

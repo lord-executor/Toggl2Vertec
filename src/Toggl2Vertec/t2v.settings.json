@@ -38,6 +38,10 @@
       "WriteTotalWorkingTime": true,
       "WriteWorkTimes": true,
       "WriteVertecEntries": true
+    },
+    {
+      "Name": "DontWorkTooEarly",
+      "StartAt": "06:00"
     }
   ]
 }

@@ -8,58 +8,57 @@ using System.Threading.Tasks;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Ninject;
 
-namespace Toggl2Vertec.Commands.Config
+namespace Toggl2Vertec.Commands.Config;
+
+public class ConfigCommand : CustomCommand<ConfigArgs>
 {
-    public class ConfigCommand : CustomCommand<ConfigArgs>
+    public ConfigCommand()
+        : base("config", "Retrieves a pre-defined configuration file from the given URL and installs it in the user's home directory", typeof(DefaultHandler))
     {
-        public ConfigCommand()
-            : base("config", "Retrieves a pre-defined configuration file from the given URL and installs it in the user's home directory", typeof(DefaultHandler))
+        AddOption(new Option<bool>("--verbose"));
+        AddOption(new Option<bool>("--debug"));
+        AddArgument(new Argument<string>("configUrl", "URL of the configuration file to install"));
+    }
+
+    public class DefaultHandler : ICommandHandler<ConfigArgs>
+    {
+        private readonly ICliLogger _logger;
+
+        public DefaultHandler(
+            ICliLogger logger
+        )
         {
-            AddOption(new Option<bool>("--verbose"));
-            AddOption(new Option<bool>("--debug"));
-            AddArgument(new Argument<string>("configUrl", "URL of the configuration file to install"));
+            _logger = logger;
         }
 
-        public class DefaultHandler : ICommandHandler<ConfigArgs>
+        public async Task<int> InvokeAsync(InvocationContext context, ConfigArgs args)
         {
-            private readonly ICliLogger _logger;
-
-            public DefaultHandler(
-                ICliLogger logger
-            )
+            var absolutePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "t2v.settings.json");
+            if (File.Exists(absolutePath))
             {
-                _logger = logger;
+                _logger.LogWarning($"There is already a configuration file under {absolutePath}.");
+                _logger.LogWarning($"Do you want to overwrite it? (y/n)");
+                var key = Console.ReadKey();
+                if (key.KeyChar != 'y')
+                {
+                    return ResultCodes.Cancelled;
+                }
             }
 
-            public async Task<int> InvokeAsync(InvocationContext context, ConfigArgs args)
+            _logger.LogInfo($"Downloading {args.ConfigUrl}");
+            var client = new HttpClient();
+            var response = await client.GetAsync(args.ConfigUrl);
+            if (response.StatusCode != HttpStatusCode.OK)
             {
-                var absolutePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "t2v.settings.json");
-                if (File.Exists(absolutePath))
-                {
-                    _logger.LogWarning($"There is already a configuration file under {absolutePath}.");
-                    _logger.LogWarning($"Do you want to overwrite it? (y/n)");
-                    var key = Console.ReadKey();
-                    if (key.KeyChar != 'y')
-                    {
-                        return ResultCodes.Cancelled;
-                    }
-                }
-
-                _logger.LogInfo($"Downloading {args.ConfigUrl}");
-                var client = new HttpClient();
-                var response = await client.GetAsync(args.ConfigUrl);
-                if (response.StatusCode != HttpStatusCode.OK)
-                {
-                    _logger.LogError($"Downloading configuration failed with HTTP status code {(int)response.StatusCode}");
-                    _logger.LogError(await response.Content.ReadAsStringAsync());
-                    return ResultCodes.Failed;
-                }
-
-                using var stream = File.Open(absolutePath, FileMode.Create);
-                await response.Content.CopyToAsync(stream);
-
-                return ResultCodes.Ok;
+                _logger.LogError($"Downloading configuration failed with HTTP status code {(int)response.StatusCode}");
+                _logger.LogError(await response.Content.ReadAsStringAsync());
+                return ResultCodes.Failed;
             }
+
+            using var stream = File.Open(absolutePath, FileMode.Create);
+            await response.Content.CopyToAsync(stream);
+
+            return ResultCodes.Ok;
         }
     }
 }

@@ -1,23 +1,22 @@
 ﻿using System;
 
-namespace Toggl2Vertec.Tracking
+namespace Toggl2Vertec.Tracking;
+
+public interface IRoundingProvider
 {
-    public interface IRoundingProvider
+    TimeSpan RoundDuration(TimeSpan duration);
+    DateTime RoundDuration(DateTime timeOfDay);
+}
+
+public class NullRoundingProvider : IRoundingProvider
+{
+    public TimeSpan RoundDuration(TimeSpan duration)
     {
-        TimeSpan RoundDuration(TimeSpan duration);
-        DateTime RoundDuration(DateTime timeOfDay);
+        return duration;
     }
 
-    public class NullRoundingProvider : IRoundingProvider
+    public DateTime RoundDuration(DateTime timeOfDay)
     {
-        public TimeSpan RoundDuration(TimeSpan duration)
-        {
-            return duration;
-        }
-
-        public DateTime RoundDuration(DateTime timeOfDay)
-        {
-            return timeOfDay;
-        }
+        return timeOfDay;
     }
 }

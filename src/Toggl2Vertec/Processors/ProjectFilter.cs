@@ -6,24 +6,24 @@ using Toggl2Vertec.Configuration;
 using Toggl2Vertec.Logging;
 using Toggl2Vertec.Tracking;
 
-namespace Toggl2Vertec.Processors
+namespace Toggl2Vertec.Processors;
+
+public class ProjectFilter : IWorkingDayProcessor
 {
-    public class ProjectFilter : IWorkingDayProcessor
+    private readonly Regex _vertecExp;
+
+    private readonly ICliLogger _logger;
+    private readonly ProjectFilterSettings _settings;
+
+    public ProjectFilter(ICliLogger logger, ProjectFilterSettings settings)
     {
-        private readonly Regex _vertecExp;
-
-        private readonly ICliLogger _logger;
-        private readonly ProjectFilterSettings _settings;
-
-        public ProjectFilter(ICliLogger logger, ProjectFilterSettings settings)
-        {
             _logger = logger;
             _vertecExp = new Regex(settings.VertecExpression);
             _settings = settings;
         }
 
-        public WorkingDay Process(WorkingDay workingDay)
-        {
+    public WorkingDay Process(WorkingDay workingDay)
+    {
             var summariesMap = new Dictionary<string, SummaryGroup>();
 
             foreach (var summary in workingDay.Summaries)
@@ -70,23 +70,22 @@ namespace Toggl2Vertec.Processors
             return workingDay;
         }
 
-        public class ProjectFilterSettings
+    public class ProjectFilterSettings
+    {
+        private readonly ProcessorDefinition _processor;
+
+        public string VertecExpression { get; }
+        public bool WarnDuplicate { get; }
+        public bool WarnMissingProject { get; }
+        public bool WarnMissingVertecNumber { get; }
+
+        public ProjectFilterSettings(ProcessorDefinition processor)
         {
-            private readonly ProcessorDefinition _processor;
-
-            public string VertecExpression { get; }
-            public bool WarnDuplicate { get; }
-            public bool WarnMissingProject { get; }
-            public bool WarnMissingVertecNumber { get; }
-
-            public ProjectFilterSettings(ProcessorDefinition processor)
-            {
                 _processor = processor;
                 VertecExpression = _processor.Section[nameof(VertecExpression)];
                 WarnDuplicate = bool.Parse(_processor.Section[nameof(WarnDuplicate)]);
                 WarnMissingProject = bool.Parse(_processor.Section[nameof(WarnMissingProject)]);
                 WarnMissingVertecNumber = bool.Parse(_processor.Section[nameof(WarnMissingVertecNumber)]);
             }
-        }
     }
 }

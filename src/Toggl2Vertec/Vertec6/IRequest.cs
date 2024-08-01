@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using Toggl2Vertec.Vertec6.Api;
 
-namespace Toggl2Vertec.Vertec6
+namespace Toggl2Vertec.Vertec6;
+
+public interface IRequest<T>
 {
-    public interface IRequest<T>
-    {
-        T Execute(XmlApiClient client);
-    }
+    T Execute(XmlApiClient client);
 }

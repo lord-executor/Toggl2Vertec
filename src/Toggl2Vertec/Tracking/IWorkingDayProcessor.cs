@@ -1,7 +1,6 @@
-﻿namespace Toggl2Vertec.Tracking
+﻿namespace Toggl2Vertec.Tracking;
+
+public interface IWorkingDayProcessor
 {
-    public interface IWorkingDayProcessor
-    {
-        WorkingDay Process(WorkingDay workingDay);
-    }
+    WorkingDay Process(WorkingDay workingDay);
 }

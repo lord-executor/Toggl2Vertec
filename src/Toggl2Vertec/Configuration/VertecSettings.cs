@@ -1,9 +1,8 @@
-﻿namespace Toggl2Vertec.Configuration
+﻿namespace Toggl2Vertec.Configuration;
+
+public class VertecSettings
 {
-    public class VertecSettings
-    {
-        public string Version { get; set; }
-        public string BaseUrl { get; set; }
-        public string CredentialsKey { get; set; }
-    }
+    public string Version { get; set; }
+    public string BaseUrl { get; set; }
+    public string CredentialsKey { get; set; }
 }
