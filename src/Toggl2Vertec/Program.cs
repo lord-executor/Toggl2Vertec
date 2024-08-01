@@ -6,6 +6,7 @@ using Toggl2Vertec.Commands.Clear;
 using Toggl2Vertec.Commands.Config;
 using Toggl2Vertec.Commands.Credentials;
 using Toggl2Vertec.Commands.List;
+using Toggl2Vertec.Commands.Overtime;
 using Toggl2Vertec.Commands.Update;
 using Toggl2Vertec.Configuration;
 using Toggl2Vertec.Logging;
@@ -41,6 +42,7 @@ public class Program
                 new ClearCommand().Bind(kernel),
                 new CredentialsCommand().Bind(kernel),
                 new ConfigCommand().Bind(kernel),
+                new OvertimeCommand().Bind(kernel)
             };
             rootCommand.Description = "Synchronizes time entries from Toggl (Track) to Vertec";
 
