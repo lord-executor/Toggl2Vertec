@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace Toggl2Vertec.Vertec6.Api;
 
@@ -14,4 +9,8 @@ public class Selection
 
     [XmlElement("sqlwhere")]
     public string SqlWhere { get; set; }
+    
+    [XmlElement("objref")]
+    public long Objref { get; set; }
+    
 }

@@ -11,6 +11,7 @@ public class Settings
     private readonly IConfiguration _config;
     public TogglSettings Toggl { get; }
     public VertecSettings Vertec { get; }
+    public ElcaSettings Elca { get; }
 
     public Settings(IConfiguration config)
     {
@@ -21,6 +22,9 @@ public class Settings
 
         Vertec = new VertecSettings();
         _config.GetSection("Vertec").Bind(Vertec);
+
+        Elca = new ElcaSettings();
+        _config.GetSection("Elca").Bind(Elca);
     }
 
     public IEnumerable<ProcessorDefinition> GetProcessors()

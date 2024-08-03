@@ -24,6 +24,9 @@ public class Vertec6Module : NinjectModule
                 .WhenSettings(IsVertec6)
                 .InTransientScope()
                 .WithMetadata("group", CheckGroupType.Access.Key);
+            Bind<OvertimeProcessor>().ToSelf()
+                .WhenSettings(IsVertec6)
+                .InTransientScope();
         }
 
     private static bool IsVertec6(Settings settings)

@@ -15,6 +15,10 @@
     "update": {
       "commandName": "Project",
       "commandLineArgs": "update"
+    },
+    "overtime": {
+      "commandName": "Project",
+      "commandLineArgs": "overtime"
     }
   }
 }
