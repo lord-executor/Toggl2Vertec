@@ -40,24 +40,24 @@ public class OvertimeProcessor
         var dateEnd = new DateTime(dateStart.Year, month, lastDayMonth);
         
         _xmlApiClient.Authenticate().Wait();
-        string monthName = CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(month);
+        var monthName = CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(month);
         _logger.LogInfo($"Gathering overtime-data for {monthName}");
 
-        long ownerId = new GetUserId(_credStore.VertecCredentials.UserName).Execute(_xmlApiClient);
-        long monthSollZeitMinuten = new GetSollZeit(dateStart, dateEnd, ownerId).Execute(_xmlApiClient);
-        long monthArbeitszeitMinuten = new GetArbeitszeit(dateStart, dateEnd, ownerId).Execute(_xmlApiClient);
-        var monthFerienbezug = TimeSpan.FromMinutes(new GetFerienbezug(dateStart, dateEnd, ownerId).Execute(_xmlApiClient));
+        var ownerId = new GetUserId(_credStore.VertecCredentials.UserName).Execute(_xmlApiClient);
+        var monthTargetTimeInMinutes = new GetTargetTime(dateStart, dateEnd, ownerId).Execute(_xmlApiClient);
+        var monthWorkTimeInMinutes = new GetWorkTime(dateStart, dateEnd, ownerId).Execute(_xmlApiClient);
+        var monthHolidayTime = TimeSpan.FromMinutes(new GetHolidayTime(dateStart, dateEnd, ownerId).Execute(_xmlApiClient));
 
-        var diffSollActual = TimeSpan.FromMinutes(monthSollZeitMinuten - monthArbeitszeitMinuten);
-        var monthSoll = TimeSpan.FromMinutes(monthSollZeitMinuten);
-        var monthArbeitszeit = TimeSpan.FromMinutes(monthArbeitszeitMinuten);
+        var deltaTargetToActual = TimeSpan.FromMinutes(monthTargetTimeInMinutes - monthWorkTimeInMinutes);
+        var monthTargetDuration = TimeSpan.FromMinutes(monthTargetTimeInMinutes);
+        var monthWorkTimeDuration = TimeSpan.FromMinutes(monthWorkTimeInMinutes);
 
         _logger.LogContent($"Summary for {monthName}:");
-        var hoursRequired = $" - Hours required:\t{FormatTimeSpan(monthSoll)}";
-        var hoursWorked = $" - Hours worked:\t{FormatTimeSpan(monthArbeitszeit)} (work: {FormatTimeSpan(monthArbeitszeit.Subtract(monthFerienbezug))}, holidays: {FormatTimeSpan(monthFerienbezug)})";
+        var hoursRequired = $" - Hours required:\t{FormatTimeSpan(monthTargetDuration)}";
+        var hoursWorked = $" - Hours worked:\t{FormatTimeSpan(monthWorkTimeDuration)} (work: {FormatTimeSpan(monthWorkTimeDuration.Subtract(monthHolidayTime))}, holidays: {FormatTimeSpan(monthHolidayTime)})";
         _logger.LogContent(hoursRequired);
         _logger.LogContent(hoursWorked);
-        _logger.LogContent($" - {(diffSollActual.TotalMinutes < 0 ? "Overtime:\t\t+" : "Undertime:\t\t-")}{FormatTimeSpan(diffSollActual)}");
+        _logger.LogContent($" - {(deltaTargetToActual.TotalMinutes < 0 ? "Overtime:\t\t+" : "Undertime:\t\t-")}{FormatTimeSpan(deltaTargetToActual)}");
         
         if (month != DateTime.Today.Month && DateTime.Today.Day != lastDayMonth)
         {
@@ -66,36 +66,30 @@ public class OvertimeProcessor
         
         // Can do some more fun if current month and there is still time
         var tomorrow = DateTime.Today.AddDays(1);
-        var beschaeftigungsGradMinutes = TimeSpan.FromMinutes(new GetBeschaeftigungsgrad(DateTime.Today, ownerId).Execute(_xmlApiClient) * _settings.Elca.DayWorkMinutes);
+        var employmentFactorDailyTargetDuration = TimeSpan.FromMinutes(new GetEmploymentFactor(DateTime.Today, ownerId).Execute(_xmlApiClient) * _settings.Elca.DayWorkMinutes);
         
-        var remainingSollZeit = TimeSpan.FromMinutes(new GetSollZeit(tomorrow, dateEnd, ownerId).Execute(_xmlApiClient));
+        var remainingTargetTime = TimeSpan.FromMinutes(new GetTargetTime(tomorrow, dateEnd, ownerId).Execute(_xmlApiClient));
         var workedToDate =
-            TimeSpan.FromMinutes(new GetArbeitszeit(dateStart, DateTime.Today, ownerId).Execute(_xmlApiClient));
+            TimeSpan.FromMinutes(new GetWorkTime(dateStart, DateTime.Today, ownerId).Execute(_xmlApiClient));
         var plannedHolidays =
-            TimeSpan.FromMinutes(new GetFerienbezug(tomorrow, dateEnd, ownerId).Execute(_xmlApiClient));
-        var remainingSollZeitAbzFerien = remainingSollZeit
-            .Subtract(plannedHolidays);
-        var remainingWorkdays = remainingSollZeitAbzFerien.TotalMinutes / beschaeftigungsGradMinutes.TotalMinutes;
-        var expectedWorkingHours = TimeSpan.FromMinutes(remainingWorkdays * beschaeftigungsGradMinutes.TotalMinutes);
-        var expectedDiff = workedToDate
+            TimeSpan.FromMinutes(new GetHolidayTime(tomorrow, dateEnd, ownerId).Execute(_xmlApiClient));
+        remainingTargetTime = remainingTargetTime.Subtract(plannedHolidays);
+        var remainingWorkdays = remainingTargetTime.TotalMinutes / employmentFactorDailyTargetDuration.TotalMinutes;
+        var expectedWorkingHours = TimeSpan.FromMinutes(remainingWorkdays * employmentFactorDailyTargetDuration.TotalMinutes);
+        var expectedDelta = workedToDate
             .Add(plannedHolidays)
             .Add(expectedWorkingHours)
-            .Subtract(monthSoll);
+            .Subtract(monthTargetDuration);
 
         _logger.LogContent($"\nGetting to zero in {monthName}");
-        _logger.LogContent($" - Still need to work:\t\t\t{FormatTimeSpan(remainingSollZeitAbzFerien)} (excl. holidays)");
+        _logger.LogContent($" - Still need to work:\t\t\t{FormatTimeSpan(remainingTargetTime)} (excl. holidays)");
         _logger.LogContent($" - Remaining workdays:\t\t\t{remainingWorkdays} (excl. holidays)");
-        _logger.LogContent($" - Expected hours until end of month:\t{FormatTimeSpan(expectedWorkingHours)} (working {FormatTimeSpan(beschaeftigungsGradMinutes)} per day)");
-        _logger.LogContent($" - Expected {(expectedDiff.TotalMinutes > 0 ? "overtime:\t\t\t+" : "undertime\t\t\t-")}{FormatTimeSpan(expectedDiff)}");
+        _logger.LogContent($" - Expected hours until end of month:\t{FormatTimeSpan(expectedWorkingHours)} (working {FormatTimeSpan(employmentFactorDailyTargetDuration)} per day)");
+        _logger.LogContent($" - Expected {(expectedDelta.TotalMinutes > 0 ? "overtime:\t\t\t+" : "undertime\t\t\t-")}{FormatTimeSpan(expectedDelta)}");
     }
 
     private static string FormatTimeSpan(TimeSpan timeSpan)
     {
-        if (timeSpan.TotalMinutes > 0)
-        {
-            return $"{(int)Math.Floor(timeSpan.TotalHours)}:{timeSpan.Minutes:00}";
-        }
-        
         return $"{(int)Math.Floor(Math.Abs(timeSpan.TotalHours))}:{Math.Abs(timeSpan.Minutes):00}";
     }
 }

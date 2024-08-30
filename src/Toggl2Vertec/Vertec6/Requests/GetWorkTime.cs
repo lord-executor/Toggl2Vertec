@@ -3,11 +3,11 @@ using Toggl2Vertec.Vertec6.Api;
 
 namespace Toggl2Vertec.Vertec6.Requests;
 
-public class GetSollZeit : GetWorkTimeBase, IRequest<long>
+public class GetWorkTime : GetWorkTimeBase, IRequest<long>
 {
     private readonly Query _query;
 
-    public GetSollZeit(DateTime von, DateTime bis, long ownerId)
+    public GetWorkTime(DateTime von, DateTime bis, long ownerId)
         : base(von, bis)
     {
         _query = new Query
@@ -15,7 +15,7 @@ public class GetSollZeit : GetWorkTimeBase, IRequest<long>
             Selection = new Selection
             {
                 Objref = ownerId,
-                Ocl = $"getSollzeit({DateStr})"
+                Ocl = $"getArbeitszeit({DateStr})"
             }
         };
     }

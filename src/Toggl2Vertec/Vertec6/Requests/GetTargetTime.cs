@@ -3,11 +3,11 @@ using Toggl2Vertec.Vertec6.Api;
 
 namespace Toggl2Vertec.Vertec6.Requests;
 
-public class GetFerienbezug : GetWorkTimeBase, IRequest<long>
+public class GetTargetTime : GetWorkTimeBase, IRequest<long>
 {
     private readonly Query _query;
-    
-    public GetFerienbezug(DateTime von, DateTime bis, long ownerId) 
+
+    public GetTargetTime(DateTime von, DateTime bis, long ownerId)
         : base(von, bis)
     {
         _query = new Query
@@ -15,11 +15,11 @@ public class GetFerienbezug : GetWorkTimeBase, IRequest<long>
             Selection = new Selection
             {
                 Objref = ownerId,
-                Ocl = $"getFerienbezug({DateStr})"
+                Ocl = $"getSollzeit({DateStr})"
             }
         };
     }
-
+    
     public override long Execute(XmlApiClient client)
     {
         var doc = client.Request(_query).Result.GetDocument();
