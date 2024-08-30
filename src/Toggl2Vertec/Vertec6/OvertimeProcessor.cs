@@ -66,7 +66,7 @@ public class OvertimeProcessor
         
         // Can do some more fun if current month and there is still time
         var tomorrow = DateTime.Today.AddDays(1);
-        var employmentFactorDailyTargetDuration = TimeSpan.FromMinutes(new GetEmploymentFactor(DateTime.Today, ownerId).Execute(_xmlApiClient) * _settings.Elca.DayWorkMinutes);
+        var employmentFactorDailyTargetDuration = TimeSpan.FromMinutes(new GetEmploymentFactor(DateTime.Today, ownerId).Execute(_xmlApiClient) * _settings.Company.DayWorkMinutes);
         
         var remainingTargetTime = TimeSpan.FromMinutes(new GetTargetTime(tomorrow, dateEnd, ownerId).Execute(_xmlApiClient));
         var workedToDate =

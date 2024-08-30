@@ -1,6 +1,6 @@
 ﻿namespace Toggl2Vertec.Configuration;
 
-public class ElcaSettings
+public class CompanySettings
 {
     public int DayWorkMinutes { get; set; }
 }

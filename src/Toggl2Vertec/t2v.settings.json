@@ -8,7 +8,7 @@
     "BaseUrl": "https://erp.elcaNet.local",
     "CredentialsKey": "t2v:vertec"
   },
-  "Elca": {
+  "Company": {
     "DayWorkMinutes": 492
   },
   "Processors": [

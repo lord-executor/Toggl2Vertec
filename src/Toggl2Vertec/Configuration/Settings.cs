@@ -11,20 +11,20 @@ public class Settings
     private readonly IConfiguration _config;
     public TogglSettings Toggl { get; }
     public VertecSettings Vertec { get; }
-    public ElcaSettings Elca { get; }
+    public CompanySettings Company { get; }
 
     public Settings(IConfiguration config)
     {
         _config = config;
 
         Toggl = new TogglSettings();
-        _config.GetSection("Toggl").Bind(Toggl);
+        _config.GetSection(nameof(Toggl)).Bind(Toggl);
 
         Vertec = new VertecSettings();
-        _config.GetSection("Vertec").Bind(Vertec);
+        _config.GetSection(nameof(Vertec)).Bind(Vertec);
 
-        Elca = new ElcaSettings();
-        _config.GetSection("Elca").Bind(Elca);
+        Company = new CompanySettings();
+        _config.GetSection(nameof(Company)).Bind(Company);
     }
 
     public IEnumerable<ProcessorDefinition> GetProcessors()
