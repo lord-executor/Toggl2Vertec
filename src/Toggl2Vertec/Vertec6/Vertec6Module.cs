@@ -15,6 +15,9 @@ public class Vertec6Module : NinjectModule
             Bind<ClearProcessor>().ToSelf()
                 .WhenSettings(IsVertec6)
                 .InTransientScope();
+            Bind<OvertimeProcessor>().ToSelf()
+                .WhenSettings(IsVertec6)
+                .InTransientScope();
 
             Bind<ICheckStep>().To<VertecCredentialCheck>()
                 .WhenSettings(IsVertec6)

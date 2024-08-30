@@ -15,8 +15,6 @@ public class ConfigCommand : CustomCommand<ConfigArgs>
     public ConfigCommand()
         : base("config", "Retrieves a pre-defined configuration file from the given URL and installs it in the user's home directory", typeof(DefaultHandler))
     {
-        AddOption(new Option<bool>("--verbose"));
-        AddOption(new Option<bool>("--debug"));
         AddArgument(new Argument<string>("configUrl", "URL of the configuration file to install"));
     }
 

@@ -12,8 +12,6 @@ public class CheckCommand : CustomCommand<DefaultArgs>
     public CheckCommand()
         : base("check", "checks configurations and tries to access Toggl and Vertec", typeof(DefaultHandler))
     {
-        AddOption(new Option<bool>("--verbose"));
-        AddOption(new Option<bool>("--debug"));
     }
 
     public class DefaultHandler : ICommandHandler<DefaultArgs>

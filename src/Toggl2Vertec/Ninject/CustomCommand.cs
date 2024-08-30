@@ -12,6 +12,12 @@ public class CustomCommand<TArg> : Command
         : base(name, description)
     {
         _handlerType = handler;
+
+        if (typeof(TArg).IsAssignableTo(typeof(ICommonArgs)))
+        {
+            AddOption(new Option<bool>("--verbose"));
+            AddOption(new Option<bool>("--debug"));
+        }
     }
 
     public virtual Command Bind(IKernel kernel)
