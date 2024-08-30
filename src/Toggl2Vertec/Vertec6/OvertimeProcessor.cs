@@ -40,7 +40,7 @@ public class OvertimeProcessor
         var dateEnd = new DateTime(dateStart.Year, month, lastDayMonth);
         
         _xmlApiClient.Authenticate().Wait();
-        string monthName = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month);
+        string monthName = CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(month);
         _logger.LogInfo($"Gathering overtime-data for {monthName}");
 
         long ownerId = new GetUserId(_credStore.VertecCredentials.UserName).Execute(_xmlApiClient);

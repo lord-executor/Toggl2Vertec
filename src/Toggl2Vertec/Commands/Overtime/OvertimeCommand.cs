@@ -36,7 +36,7 @@ public class OvertimeCommand : CustomCommand<OvertimeArgs>
                 return Task.FromResult(ResultCodes.InvalidDate);
             }
 
-            _logger.LogContent($"Gathering overtime data for {CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(args.Month)}");
+            _logger.LogContent($"Gathering overtime data for {CultureInfo.InvariantCulture.DateTimeFormat.GetMonthName(args.Month)}");
             _overtimeProcessor.Process(args.Month);
             
             return Task.FromResult(ResultCodes.Ok);
