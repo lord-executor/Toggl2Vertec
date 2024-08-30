@@ -12,8 +12,6 @@ public class CredentialsCommand : CustomCommand<CredentialArgs>
     public CredentialsCommand()
         : base("credentials", "configures Toggl & Vertec credentials throught the command line", typeof(DefaultHandler))
     {
-        AddOption(new Option<bool>("--verbose"));
-        AddOption(new Option<bool>("--debug"));
         AddOption(new Option<bool>("--prompt", () => true, "Requests passwords in interactive CLI mode"));
         AddOption(new Option<bool>("--no-toggl", "Do not prompt Toggl password in interactive CLI mode"));
         AddOption(new Option<bool>("--no-vertec", "Do not prompt Vertec password in interactive CLI mode"));
