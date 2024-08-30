@@ -14,7 +14,7 @@ public class OvertimeCommand : CustomCommand<OvertimeArgs>
     public OvertimeCommand() 
         : base("overtime", "allows to track overtime in Vertec for a specific month", typeof(DefaultHandler))
     {
-        AddArgument(new Argument<int>("month", () => DateTime.Today.Month));
+        AddArgument(new Argument<int>("month", () => DateTime.Today.Month, "The month (number 1-12) for which to display the overtime. Default is the current month."));
     }
 
     public class DefaultHandler : ICommandHandler<OvertimeArgs>
